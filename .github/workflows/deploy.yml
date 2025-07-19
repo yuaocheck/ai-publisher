@@ -124,20 +124,49 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ github.run_number }}
-          release_name: Release v${{ github.run_number }}
+          release_name: AI Publisher v${{ github.run_number }} - publisher.ai
           body: |
-            🚀 Automated deployment to Cloudflare Workers
-            
-            **Changes in this release:**
+            🚀 AI Publisher deployed to publisher.ai with Cloudflare MCP integration
+
+            **🌟 Features in this release:**
+            - ✅ 14 Cloudflare MCP Servers integrated
+            - ✅ Global edge deployment (200+ data centers)
+            - ✅ Multi-platform social media publishing
+            - ✅ AI content generation (text, images, videos)
+            - ✅ Enterprise-grade security and performance
+
+            **🔧 Cloudflare MCP Servers:**
+            - Documentation Server - Cloudflare docs search
+            - Workers Bindings Server - Storage, AI, compute primitives
+            - Workers Builds Server - Build insights and management
+            - Observability Server - Logs and analytics debugging
+            - Radar Server - Global Internet traffic insights
+            - Container Server - Sandbox development environment
+            - Browser Rendering Server - Web page rendering and screenshots
+            - Logpush Server - Log job health summaries
+            - AI Gateway Server - AI logs and prompt analytics
+            - AutoRAG Server - Document search and RAG analytics
+            - Audit Logs Server - Security audit logs and reports
+            - DNS Analytics Server - DNS performance optimization
+            - Digital Experience Monitoring - App performance insights
+            - Cloudflare One CASB Server - SaaS security misconfigurations
+            - GraphQL Server - Analytics via Cloudflare GraphQL API
+
+            **📋 Changes in this release:**
             ${{ github.event.head_commit.message }}
-            
-            **Deployment Details:**
+
+            **🚀 Deployment Details:**
             - Environment: Production
+            - Domain: publisher.ai
             - Commit: ${{ github.sha }}
             - Deployed at: ${{ github.event.head_commit.timestamp }}
-            
-            **Links:**
-            - [Live Site](https://ai-publisher.com)
+
+            **🌐 Access Links:**
+            - [Live Site](https://publisher.ai)
+            - [Main App](https://publisher.ai/demo/start.html)
+            - [MCP Integration](https://publisher.ai/demo/mcp-integration.html)
+            - [API Health](https://publisher.ai/api/health)
+            - [MCP Health](https://publisher.ai/api/mcp/health)
             - [Commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
           draft: false
           prerelease: false
@@ -151,11 +180,20 @@ jobs:
       - name: Notify Success
         if: needs.deploy-production.result == 'success'
         run: |
-          echo "🎉 Deployment successful!"
-          echo "Site is live at: https://ai-publisher.com"
+          echo "🎉 AI Publisher deployment to publisher.ai successful!"
+          echo "🌐 Main site: https://publisher.ai"
+          echo "🚀 App: https://publisher.ai/demo/start.html"
+          echo "🔧 MCP Integration: https://publisher.ai/demo/mcp-integration.html"
+          echo "📊 API Health: https://publisher.ai/api/health"
+          echo "⚡ MCP Health: https://publisher.ai/api/mcp/health"
+          echo "🌍 Global deployment with 14 Cloudflare MCP servers integrated!"
 
       - name: Notify Failure
         if: needs.deploy-production.result == 'failure'
         run: |
-          echo "❌ Deployment failed!"
+          echo "❌ AI Publisher deployment to publisher.ai failed!"
           echo "Please check the logs for more information."
+          echo "Common issues:"
+          echo "- Check GitHub Secrets are set correctly"
+          echo "- Verify Cloudflare API token permissions"
+          echo "- Ensure Account ID is correct"
