@@ -77,12 +77,16 @@ main() {
 check_requirements() {
     print_header "🔧 检查必要工具"
     
-    if ! command_exists wrangler; then
+    if ! command_exists wrangler && ! [ -f "node_modules/.bin/wrangler" ]; then
         print_info "安装 Wrangler CLI..."
-        npm install -g wrangler
+        npm install wrangler --save-dev
         print_success "Wrangler CLI 安装完成"
     else
-        print_success "Wrangler CLI 已安装: $(wrangler --version)"
+        if [ -f "node_modules/.bin/wrangler" ]; then
+            print_success "Wrangler CLI 已安装 (本地): $(npx wrangler --version | head -1)"
+        else
+            print_success "Wrangler CLI 已安装 (全局): $(wrangler --version)"
+        fi
     fi
     
     if ! command_exists node; then
@@ -102,13 +106,13 @@ check_requirements() {
 check_cloudflare_auth() {
     print_header "🔐 检查 Cloudflare 认证"
     
-    if ! wrangler whoami >/dev/null 2>&1; then
+    if ! npx wrangler whoami >/dev/null 2>&1; then
         print_info "需要登录 Cloudflare..."
-        wrangler login
+        npx wrangler login
     fi
-    
+
     print_success "已登录 Cloudflare"
-    wrangler whoami
+    npx wrangler whoami
 }
 
 # 设置环境变量
@@ -147,7 +151,7 @@ setup_environment_variables() {
     MISSING_REQUIRED=()
     for secret_info in "${REQUIRED_SECRETS[@]}"; do
         secret_name=$(echo "$secret_info" | cut -d':' -f1)
-        if ! wrangler secret list 2>/dev/null | grep -q "$secret_name"; then
+        if ! npx wrangler secret list 2>/dev/null | grep -q "$secret_name"; then
             MISSING_REQUIRED+=("$secret_info")
         fi
     done
@@ -172,7 +176,7 @@ setup_environment_variables() {
             read -r secret_value
             
             if [ -n "$secret_value" ]; then
-                echo "$secret_value" | wrangler secret put "$secret_name"
+                echo "$secret_value" | npx wrangler secret put "$secret_name"
                 print_success "$secret_name 设置完成"
             else
                 print_error "$secret_name 是必需的，无法继续部署"
@@ -188,7 +192,7 @@ setup_environment_variables() {
     MISSING_OPTIONAL=()
     for secret_info in "${OPTIONAL_SECRETS[@]}"; do
         secret_name=$(echo "$secret_info" | cut -d':' -f1)
-        if ! wrangler secret list 2>/dev/null | grep -q "$secret_name"; then
+        if ! npx wrangler secret list 2>/dev/null | grep -q "$secret_name"; then
             MISSING_OPTIONAL+=("$secret_info")
         fi
     done
@@ -216,7 +220,7 @@ setup_environment_variables() {
                 read -r secret_value
                 
                 if [ -n "$secret_value" ]; then
-                    echo "$secret_value" | wrangler secret put "$secret_name"
+                    echo "$secret_value" | npx wrangler secret put "$secret_name"
                     print_success "$secret_name 设置完成"
                 else
                     print_info "跳过 $secret_name"
@@ -235,15 +239,15 @@ setup_kv_storage() {
     print_info "创建 KV 命名空间..."
     
     # 检查是否已存在
-    if wrangler kv:namespace list | grep -q "CACHE"; then
+    if npx wrangler kv:namespace list | grep -q "CACHE"; then
         print_success "KV 命名空间已存在"
     else
         print_info "创建生产环境 KV 命名空间..."
-        wrangler kv:namespace create "CACHE"
-        
+        npx wrangler kv:namespace create "CACHE"
+
         print_info "创建预览环境 KV 命名空间..."
-        wrangler kv:namespace create "CACHE" --preview
-        
+        npx wrangler kv:namespace create "CACHE" --preview
+
         print_success "KV 命名空间创建完成"
         print_warning "请更新 wrangler.toml 文件中的 KV 命名空间 ID"
     fi
@@ -257,7 +261,7 @@ deploy_to_workers() {
     npm install
     
     print_info "部署到生产环境..."
-    if wrangler deploy --env production; then
+    if npx wrangler deploy --env production; then
         print_success "部署成功！"
     else
         print_error "部署失败！"
@@ -360,9 +364,9 @@ deployment_complete() {
     
     echo ""
     print_info "🔧 管理命令:"
-    print_info "  查看日志: wrangler tail --env production"
-    print_info "  更新部署: wrangler deploy --env production"
-    print_info "  管理环境变量: wrangler secret list"
+    print_info "  查看日志: npx wrangler tail --env production"
+    print_info "  更新部署: npx wrangler deploy --env production"
+    print_info "  管理环境变量: npx wrangler secret list"
     
     echo ""
     print_success "🎊 部署成功！AI Publisher 现在可以通过 publisher.ai 访问！"

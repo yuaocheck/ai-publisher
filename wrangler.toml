@@ -7,6 +7,19 @@ compatibility_flags = ["nodejs_compat"]
 [env.production]
 name = "ai-publisher-prod"
 route = "publisher.ai/*"
+vars = { NODE_ENV = "production", NEXTAUTH_URL = "https://publisher.ai", APP_NAME = "AI Publisher", APP_VERSION = "1.0.0", AUTO_DEPLOY = "true", WORKER_NAME = "ai-publisher", DOMAIN = "publisher.ai" }
+kv_namespaces = [
+  { binding = "CACHE", id = "your-kv-namespace-id", preview_id = "your-preview-kv-namespace-id" }
+]
+r2_buckets = [
+  { binding = "MEDIA_BUCKET", bucket_name = "ai-publisher-media" }
+]
+durable_objects = { bindings = [
+  { name = "SCHEDULER", class_name = "SchedulerDurableObject" }
+]}
+analytics_engine_datasets = [
+  { binding = "ANALYTICS" }
+]
 
 # Staging environment
 [env.staging]
@@ -54,15 +67,7 @@ class_name = "SchedulerDurableObject"
 tag = "v1"
 new_classes = ["SchedulerDurableObject"]
 
-# Build configuration
-[build]
-command = "npm run build"
-cwd = "."
-
-# Pages configuration (for static assets)
-[pages]
-build_output_dir = "out"
-compatibility_date = "2024-01-01"
+# No build configuration needed for Workers
 
 # Custom domains
 [[routes]]
