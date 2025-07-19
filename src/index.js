@@ -1,9 +1,9 @@
 // AI Publisher - Cloudflare Workers Entry Point
 // 这是 Cloudflare Workers 的主入口文件，集成 Cloudflare MCP Server
 
-import { handleRequest } from './handlers/router';
-import { corsHeaders } from './utils/cors';
-import CloudflareMCPIntegration from '../cloudflare-mcp-integration.js';
+import { handleRequest } from './handlers/router.js';
+import { corsHeaders } from './utils/cors.js';
+import { CloudflareMCPIntegration } from '../cloudflare-mcp-integration.js';
 
 // 主要的 fetch 事件处理器
 export default {

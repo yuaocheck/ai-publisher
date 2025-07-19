@@ -3,94 +3,23 @@ main = "src/index.js"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Variables
+[vars]
+NODE_ENV = "production"
+ENVIRONMENT = "production"
+
 # Production environment
 [env.production]
 name = "ai-publisher-prod"
-route = "publisher.ai/*"
-vars = { NODE_ENV = "production", NEXTAUTH_URL = "https://publisher.ai", APP_NAME = "AI Publisher", APP_VERSION = "1.0.0", AUTO_DEPLOY = "true", WORKER_NAME = "ai-publisher", DOMAIN = "publisher.ai" }
-kv_namespaces = [
-  { binding = "CACHE", id = "your-kv-namespace-id", preview_id = "your-preview-kv-namespace-id" }
-]
-r2_buckets = [
-  { binding = "MEDIA_BUCKET", bucket_name = "ai-publisher-media" }
-]
-durable_objects = { bindings = [
-  { name = "SCHEDULER", class_name = "SchedulerDurableObject" }
-]}
-analytics_engine_datasets = [
-  { binding = "ANALYTICS" }
-]
+vars = { NODE_ENV = "production", ENVIRONMENT = "production" }
 
-# Staging environment
-[env.staging]
-name = "ai-publisher-staging"
-route = "staging.publisher.ai/*"
-
-# Environment variables (set via wrangler secret)
-# These should be set using: wrangler secret put VARIABLE_NAME
-[vars]
-NODE_ENV = "production"
-NEXTAUTH_URL = "https://publisher.ai"
-APP_NAME = "AI Publisher"
-APP_VERSION = "1.0.0"
-AUTO_DEPLOY = "true"
-WORKER_NAME = "ai-publisher"
-DOMAIN = "publisher.ai"
-
-# KV namespaces for caching
+# KV Namespaces (will be created automatically)
 [[kv_namespaces]]
 binding = "CACHE"
-id = "your-kv-namespace-id"
-preview_id = "your-preview-kv-namespace-id"
+id = "placeholder"
+preview_id = "placeholder"
 
-# D1 database (if using Cloudflare D1 instead of Supabase)
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "ai-publisher-db"
-# database_id = "your-d1-database-id"
-
-# R2 bucket for media storage
+# R2 Buckets (will be created automatically)
 [[r2_buckets]]
 binding = "MEDIA_BUCKET"
 bucket_name = "ai-publisher-media"
-
-# Analytics Engine for custom metrics
-[[analytics_engine_datasets]]
-binding = "ANALYTICS"
-
-# Durable Objects (for real-time features)
-[[durable_objects.bindings]]
-name = "SCHEDULER"
-class_name = "SchedulerDurableObject"
-
-[[migrations]]
-tag = "v1"
-new_classes = ["SchedulerDurableObject"]
-
-# No build configuration needed for Workers
-
-# Custom domains
-[[routes]]
-pattern = "publisher.ai/*"
-zone_name = "publisher.ai"
-
-[[routes]]
-pattern = "www.publisher.ai/*"
-zone_name = "publisher.ai"
-
-# Rate limiting
-[limits]
-cpu_ms = 50000
-
-# Cron triggers for background tasks
-[[triggers.crons]]
-cron = "0 */6 * * *"  # Every 6 hours
-name = "token-refresh"
-
-[[triggers.crons]]
-cron = "0 0 * * *"    # Daily at midnight
-name = "cleanup-tasks"
-
-[[triggers.crons]]
-cron = "*/15 * * * *" # Every 15 minutes
-name = "process-queue"
