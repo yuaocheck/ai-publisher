@@ -12,8 +12,12 @@ Are you missing the `User->User Details->Read` permission?
 
 ## 🔧 需要添加的权限
 
-### 当前缺少的权限：
-- ❌ **User:User Details:Read** - 这是关键缺失的权限
+### 🚨 最新发现的问题：
+即使添加了 `User:User Details:Read` 权限，仍然出现错误：
+```
+✘ [ERROR] A request to the Cloudflare API (/memberships) failed.
+Authentication error [code: 10000]
+```
 
 ### 完整的必需权限列表：
 ```
@@ -21,8 +25,13 @@ Zone:Zone:Edit
 Zone:Zone Settings:Edit
 Account:Cloudflare Workers:Edit
 Account:Account Settings:Read
-User:User Details:Read  ← 这个权限缺失
+User:User Details:Read  ✅ 已添加
+Account:Memberships:Read  ← 新发现缺失的权限
 ```
+
+### 🔍 权限分析：
+- ✅ **User:User Details:Read** - 已添加，现在可以显示邮箱
+- ❌ **Account:Memberships:Read** - 缺失，导致 /memberships API 调用失败
 
 ## 📋 修复步骤
 
@@ -33,7 +42,8 @@ User:User Details:Read  ← 这个权限缺失
 
 ### 步骤 2：添加缺失权限
 在权限设置中添加：
-- **User** → **User Details** → **Read**
+- ✅ **User** → **User Details** → **Read** (已添加)
+- ❌ **Account** → **Memberships** → **Read** (需要添加)
 
 ### 步骤 3：保存并测试
 1. **保存** Token 设置
@@ -69,6 +79,7 @@ Zone:Zone:Edit
 Zone:Zone Settings:Edit
 Account:Cloudflare Workers:Edit
 Account:Account Settings:Read
+Account:Memberships:Read
 User:User Details:Read
 ```
 
