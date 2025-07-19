@@ -1,13 +1,20 @@
 // AI Publisher - Cloudflare Workers Entry Point
-// 这是 Cloudflare Workers 的主入口文件
+// 这是 Cloudflare Workers 的主入口文件，集成 Cloudflare MCP Server
 
 import { handleRequest } from './handlers/router';
 import { corsHeaders } from './utils/cors';
+import CloudflareMCPIntegration from '../cloudflare-mcp-integration.js';
 
 // 主要的 fetch 事件处理器
 export default {
   async fetch(request, env, ctx) {
     try {
+      // 初始化 MCP 集成
+      const mcpIntegration = new CloudflareMCPIntegration(env);
+
+      // 将 MCP 集成添加到环境中
+      env.mcp = mcpIntegration;
+
       // 处理 CORS 预检请求
       if (request.method === 'OPTIONS') {
         return new Response(null, {
@@ -18,7 +25,7 @@ export default {
 
       // 路由请求到相应的处理器
       const response = await handleRequest(request, env, ctx);
-      
+
       // 添加 CORS 头部
       Object.entries(corsHeaders).forEach(([key, value]) => {
         response.headers.set(key, value);

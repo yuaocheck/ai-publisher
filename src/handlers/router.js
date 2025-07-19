@@ -4,6 +4,7 @@ import { handleStaticAssets } from './static';
 import { handleAPI } from './api';
 import { handleOAuth } from './oauth';
 import { handleWebhooks } from './webhooks';
+import { handleMCPAPI } from './mcp';
 
 export async function handleRequest(request, env, ctx) {
   const url = new URL(request.url);
@@ -18,6 +19,11 @@ export async function handleRequest(request, env, ctx) {
       pathname.endsWith('.jpg') ||
       pathname.endsWith('.ico')) {
     return handleStaticAssets(request, env);
+  }
+
+  // MCP API 路由处理
+  if (pathname.startsWith('/api/mcp/')) {
+    return handleMCPAPI(request, env, ctx);
   }
 
   // API 路由处理

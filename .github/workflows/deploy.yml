@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Workers
+name: Deploy AI Publisher to Cloudflare Workers
 
 on:
   push:
@@ -10,6 +10,15 @@ on:
       - main
       - master
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
 
 jobs:
   test:
@@ -89,6 +98,24 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy --env production
           workingDirectory: '.'
+          secrets: |
+            GEMINI_API_KEY
+            TWITTER_CLIENT_ID
+            TWITTER_CLIENT_SECRET
+            FACEBOOK_APP_ID
+            FACEBOOK_APP_SECRET
+            INSTAGRAM_CLIENT_ID
+            INSTAGRAM_CLIENT_SECRET
+            LINKEDIN_CLIENT_ID
+            LINKEDIN_CLIENT_SECRET
+            YOUTUBE_CLIENT_ID
+            YOUTUBE_CLIENT_SECRET
+            TIKTOK_CLIENT_KEY
+            TIKTOK_CLIENT_SECRET
+            OPENAI_API_KEY
+            SUPABASE_URL
+            SUPABASE_ANON_KEY
+            SUPABASE_SERVICE_ROLE_KEY
 
       - name: Create GitHub Release
         if: success()

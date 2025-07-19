@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudflare MCP 集成 - AI Publisher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div x-data="mcpIntegration()" class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <a href="start.html" class="flex items-center">
+                            <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                                <span class="text-white font-bold text-sm">AI</span>
+                            </div>
+                            <span class="ml-2 text-xl font-bold text-gray-900">Publisher</span>
+                        </a>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-500">Cloudflare MCP 集成</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl font-bold text-white mb-4">Cloudflare MCP 集成</h1>
+                <p class="text-xl text-blue-100 mb-6">
+                    连接 Cloudflare Model Context Protocol 服务器，获得强大的云服务能力
+                </p>
+                <div class="flex justify-center space-x-4">
+                    <button @click="checkMCPHealth()" 
+                            class="bg-white text-blue-600 px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition duration-200">
+                        <i class="fas fa-heartbeat mr-2"></i>健康检查
+                    </button>
+                    <button @click="loadMCPServers()" 
+                            class="border border-white text-white px-6 py-2 rounded-lg font-medium hover:bg-white hover:text-blue-600 transition duration-200">
+                        <i class="fas fa-server mr-2"></i>加载服务器
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- MCP Servers Status -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">MCP 服务器状态</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <template x-for="server in mcpServers" :key="server.name">
+                        <div class="border rounded-lg p-4 hover:shadow-md transition duration-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900" x-text="server.name"></h3>
+                                <span :class="getStatusColor(server.status)" 
+                                      class="px-2 py-1 rounded-full text-xs font-medium"
+                                      x-text="server.status || 'unknown'"></span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3" x-text="server.description"></p>
+                            <button @click="testServer(server.name)" 
+                                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-blue-700 transition duration-200">
+                                测试连接
+                            </button>
+                        </div>
+                    </template>
+                </div>
+
+                <div x-show="healthStatus" class="bg-gray-50 rounded-lg p-4">
+                    <h3 class="font-semibold text-gray-900 mb-2">健康检查结果</h3>
+                    <pre class="text-sm text-gray-700 overflow-auto" x-text="JSON.stringify(healthStatus, null, 2)"></pre>
+                </div>
+            </div>
+
+            <!-- MCP Tools -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Documentation Search -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">
+                        <i class="fas fa-book text-blue-600 mr-2"></i>文档搜索
+                    </h3>
+                    <div class="space-y-4">
+                        <input x-model="docQuery" 
+                               type="text" 
+                               placeholder="搜索 Cloudflare 文档..."
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <button @click="searchDocs()" 
+                                :disabled="!docQuery || loading"
+                                class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition duration-200">
+                            <span x-show="!loading">搜索文档</span>
+                            <span x-show="loading">搜索中...</span>
+                        </button>
+                        <div x-show="docResult" class="bg-gray-50 rounded-lg p-4">
+                            <pre class="text-sm text-gray-700 overflow-auto max-h-64" x-text="JSON.stringify(docResult, null, 2)"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Browser Rendering -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">
+                        <i class="fas fa-globe text-green-600 mr-2"></i>浏览器渲染
+                    </h3>
+                    <div class="space-y-4">
+                        <input x-model="renderUrl" 
+                               type="url" 
+                               placeholder="输入要渲染的网页 URL..."
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <div class="flex space-x-2">
+                            <button @click="renderPage()" 
+                                    :disabled="!renderUrl || loading"
+                                    class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 transition duration-200">
+                                渲染页面
+                            </button>
+                            <button @click="takeScreenshot()" 
+                                    :disabled="!renderUrl || loading"
+                                    class="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 disabled:opacity-50 transition duration-200">
+                                截图
+                            </button>
+                        </div>
+                        <div x-show="renderResult" class="bg-gray-50 rounded-lg p-4">
+                            <pre class="text-sm text-gray-700 overflow-auto max-h-64" x-text="JSON.stringify(renderResult, null, 2)"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Radar Data -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">
+                        <i class="fas fa-chart-line text-orange-600 mr-2"></i>Radar 数据
+                    </h3>
+                    <div class="space-y-4">
+                        <select x-model="radarType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">选择数据类型</option>
+                            <option value="traffic">流量数据</option>
+                            <option value="attacks">攻击数据</option>
+                            <option value="outages">故障数据</option>
+                            <option value="quality">质量数据</option>
+                        </select>
+                        <button @click="getRadarData()" 
+                                :disabled="!radarType || loading"
+                                class="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 disabled:opacity-50 transition duration-200">
+                            获取数据
+                        </button>
+                        <div x-show="radarResult" class="bg-gray-50 rounded-lg p-4">
+                            <pre class="text-sm text-gray-700 overflow-auto max-h-64" x-text="JSON.stringify(radarResult, null, 2)"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Gateway -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">
+                        <i class="fas fa-robot text-purple-600 mr-2"></i>AI Gateway
+                    </h3>
+                    <div class="space-y-4">
+                        <input x-model="aiQuery" 
+                               type="text" 
+                               placeholder="搜索 AI Gateway 日志..."
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <button @click="queryAIGateway()" 
+                                :disabled="!aiQuery || loading"
+                                class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 disabled:opacity-50 transition duration-200">
+                            查询日志
+                        </button>
+                        <div x-show="aiResult" class="bg-gray-50 rounded-lg p-4">
+                            <pre class="text-sm text-gray-700 overflow-auto max-h-64" x-text="JSON.stringify(aiResult, null, 2)"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom MCP Call -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mt-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">
+                    <i class="fas fa-code text-red-600 mr-2"></i>自定义 MCP 调用
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <select x-model="customServer" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">选择服务器</option>
+                        <template x-for="server in mcpServers" :key="server.name">
+                            <option :value="server.name" x-text="server.name"></option>
+                        </template>
+                    </select>
+                    <input x-model="customMethod" 
+                           type="text" 
+                           placeholder="方法名"
+                           class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <button @click="makeCustomCall()" 
+                            :disabled="!customServer || !customMethod || loading"
+                            class="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 disabled:opacity-50 transition duration-200">
+                        调用
+                    </button>
+                </div>
+                <textarea x-model="customParams" 
+                          placeholder='参数 (JSON 格式): {"key": "value"}'
+                          rows="3"
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"></textarea>
+                <div x-show="customResult" class="bg-gray-50 rounded-lg p-4">
+                    <pre class="text-sm text-gray-700 overflow-auto max-h-64" x-text="JSON.stringify(customResult, null, 2)"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function mcpIntegration() {
+            return {
+                loading: false,
+                mcpServers: [
+                    { name: 'docs', description: 'Get up to date reference information on Cloudflare' },
+                    { name: 'bindings', description: 'Build Workers applications with storage, AI, and compute primitives' },
+                    { name: 'builds', description: 'Get insights and manage your Cloudflare Workers Builds' },
+                    { name: 'observability', description: 'Debug and get insight into your application\'s logs and analytics' },
+                    { name: 'radar', description: 'Get global Internet traffic insights, trends, URL scans, and other utilities' },
+                    { name: 'container', description: 'Spin up a sandbox development environment' },
+                    { name: 'browser', description: 'Fetch web pages, convert them to markdown and take screenshots' },
+                    { name: 'logpush', description: 'Get quick summaries for Logpush job health' },
+                    { name: 'aiGateway', description: 'Search your logs, get details about the prompts and responses' },
+                    { name: 'autorag', description: 'List and search documents on your AutoRAGs' },
+                    { name: 'auditLogs', description: 'Query audit logs and generate reports for review' },
+                    { name: 'dnsAnalytics', description: 'Optimize DNS performance and debug issues based on current set up' },
+                    { name: 'dex', description: 'Get quick insight on critical applications for your organization' },
+                    { name: 'casb', description: 'Quickly identify any security misconfigurations for SaaS applications' },
+                    { name: 'graphql', description: 'Get analytics data using Cloudflare\'s GraphQL API' }
+                ],
+                healthStatus: null,
+                docQuery: '',
+                docResult: null,
+                renderUrl: '',
+                renderResult: null,
+                radarType: '',
+                radarResult: null,
+                aiQuery: '',
+                aiResult: null,
+                customServer: '',
+                customMethod: '',
+                customParams: '',
+                customResult: null,
+
+                async checkMCPHealth() {
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/api/mcp/health');
+                        this.healthStatus = await response.json();
+                        
+                        // 更新服务器状态
+                        if (this.healthStatus.servers) {
+                            this.mcpServers.forEach(server => {
+                                const status = this.healthStatus.servers[server.name];
+                                server.status = status ? status.status : 'unknown';
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Health check failed:', error);
+                        this.healthStatus = { error: error.message };
+                    }
+                    this.loading = false;
+                },
+
+                async loadMCPServers() {
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/api/mcp/servers');
+                        const data = await response.json();
+                        if (data.servers) {
+                            this.mcpServers = data.servers;
+                        }
+                    } catch (error) {
+                        console.error('Load servers failed:', error);
+                    }
+                    this.loading = false;
+                },
+
+                async testServer(serverName) {
+                    console.log(`Testing server: ${serverName}`);
+                    // 这里可以添加特定的服务器测试逻辑
+                },
+
+                async searchDocs() {
+                    if (!this.docQuery) return;
+                    
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/api/mcp/docs/search', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ query: this.docQuery })
+                        });
+                        this.docResult = await response.json();
+                    } catch (error) {
+                        console.error('Doc search failed:', error);
+                        this.docResult = { error: error.message };
+                    }
+                    this.loading = false;
+                },
+
+                async renderPage() {
+                    if (!this.renderUrl) return;
+                    
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/api/mcp/browser/render', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ url: this.renderUrl })
+                        });
+                        this.renderResult = await response.json();
+                    } catch (error) {
+                        console.error('Render failed:', error);
+                        this.renderResult = { error: error.message };
+                    }
+                    this.loading = false;
+                },
+
+                async takeScreenshot() {
+                    if (!this.renderUrl) return;
+                    
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/api/mcp/browser/screenshot', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ url: this.renderUrl })
+                        });
+                        this.renderResult = await response.json();
+                    } catch (error) {
+                        console.error('Screenshot failed:', error);
+                        this.renderResult = { error: error.message };
+                    }
+                    this.loading = false;
+                },
+
+                async getRadarData() {
+                    if (!this.radarType) return;
+                    
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/api/mcp/radar/query', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ type: this.radarType, params: {} })
+                        });
+                        this.radarResult = await response.json();
+                    } catch (error) {
+                        console.error('Radar query failed:', error);
+                        this.radarResult = { error: error.message };
+                    }
+                    this.loading = false;
+                },
+
+                async queryAIGateway() {
+                    if (!this.aiQuery) return;
+                    
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/api/mcp/ai-gateway/query', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ query: this.aiQuery })
+                        });
+                        this.aiResult = await response.json();
+                    } catch (error) {
+                        console.error('AI Gateway query failed:', error);
+                        this.aiResult = { error: error.message };
+                    }
+                    this.loading = false;
+                },
+
+                async makeCustomCall() {
+                    if (!this.customServer || !this.customMethod) return;
+                    
+                    let params = {};
+                    if (this.customParams) {
+                        try {
+                            params = JSON.parse(this.customParams);
+                        } catch (error) {
+                            this.customResult = { error: 'Invalid JSON parameters' };
+                            return;
+                        }
+                    }
+                    
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/api/mcp/call', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                server: this.customServer,
+                                method: this.customMethod,
+                                params: params
+                            })
+                        });
+                        this.customResult = await response.json();
+                    } catch (error) {
+                        console.error('Custom call failed:', error);
+                        this.customResult = { error: error.message };
+                    }
+                    this.loading = false;
+                },
+
+                getStatusColor(status) {
+                    switch (status) {
+                        case 'healthy': return 'bg-green-100 text-green-800';
+                        case 'unhealthy': return 'bg-red-100 text-red-800';
+                        case 'error': return 'bg-red-100 text-red-800';
+                        default: return 'bg-gray-100 text-gray-800';
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
