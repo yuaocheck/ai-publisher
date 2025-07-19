@@ -1,8 +1,6 @@
 // AI Publisher - API 处理器
 
-import { handleSocialAPI } from '../services/social';
-import { handleAIAPI } from '../services/ai';
-import { handleMediaAPI } from '../services/media';
+// 简化的 API 处理器，移除复杂的服务依赖
 
 export async function handleAPI(request, env, ctx) {
   const url = new URL(request.url);
@@ -10,19 +8,46 @@ export async function handleAPI(request, env, ctx) {
   const method = request.method;
 
   try {
-    // 社交媒体 API
+    // 健康检查 API
+    if (pathname === '/api/health') {
+      return new Response(JSON.stringify({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0',
+        environment: env.NODE_ENV || 'production'
+      }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // 社交媒体 API - 简化版本
     if (pathname.startsWith('/api/social/')) {
-      return handleSocialAPI(request, env, ctx);
+      return new Response(JSON.stringify({
+        message: 'Social API endpoint',
+        available_platforms: ['twitter', 'facebook', 'instagram', 'linkedin', 'youtube', 'tiktok']
+      }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    // AI 生成 API
+    // AI 生成 API - 简化版本
     if (pathname.startsWith('/api/ai/')) {
-      return handleAIAPI(request, env, ctx);
+      return new Response(JSON.stringify({
+        message: 'AI API endpoint',
+        available_services: ['text-generation', 'image-generation', 'video-generation']
+      }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    // 媒体处理 API
+    // 媒体处理 API - 简化版本
     if (pathname.startsWith('/api/media/')) {
-      return handleMediaAPI(request, env, ctx);
+      return new Response(JSON.stringify({
+        message: 'Media API endpoint',
+        supported_formats: ['jpg', 'png', 'gif', 'mp4', 'webm']
+      }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     // OAuth 令牌交换
