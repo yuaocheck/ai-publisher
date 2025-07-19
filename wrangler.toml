@@ -8,7 +8,7 @@ compatibility_flags = ["nodejs_compat"]
 NODE_ENV = "production"
 ENVIRONMENT = "production"
 APP_NAME = "AI Publisher"
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.1"
 
 # Production environment
 [env.production]
