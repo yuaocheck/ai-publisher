@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Publisher - 控制台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50" x-data="dashboardData()">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">AI</span>
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-gray-900">Publisher</span>
+                    </div>
+                    <div class="hidden md:ml-8 md:flex md:space-x-8">
+                        <a href="#" class="text-blue-600 border-b-2 border-blue-500 px-1 pt-1 text-sm font-medium">
+                            <i class="fas fa-home mr-2"></i>控制台
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">
+                            <i class="fas fa-file-alt mr-2"></i>内容管理
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">
+                            <i class="fas fa-calendar mr-2"></i>发布计划
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">
+                            <i class="fas fa-chart-bar mr-2"></i>数据分析
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">
+                            <i class="fas fa-link mr-2"></i>社交账号
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <select class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm">
+                            <option>我的公司</option>
+                            <option>营销团队</option>
+                        </select>
+                    </div>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-plus mr-2"></i>创建内容
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <img src="https://via.placeholder.com/32x32" alt="Avatar" class="w-8 h-8 rounded-full">
+                        <span class="text-sm text-gray-700">张三</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-900">控制台</h1>
+            <p class="text-gray-600 mt-2">我的公司 • 欢迎回来，张三</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">总内容数</p>
+                        <p class="text-2xl font-bold text-gray-900">1,234</p>
+                    </div>
+                    <div class="text-sm text-green-600">+12%</div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">已发布</p>
+                        <p class="text-2xl font-bold text-gray-900">987</p>
+                    </div>
+                    <div class="text-sm text-green-600">+8%</div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">待发布</p>
+                        <p class="text-2xl font-bold text-gray-900">45</p>
+                    </div>
+                    <div class="text-sm text-blue-600">+3%</div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">连接账号</p>
+                        <p class="text-2xl font-bold text-gray-900">8</p>
+                    </div>
+                    <div class="text-sm text-gray-600">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mb-8">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">快速操作</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="inline-flex p-3 rounded-lg text-white bg-blue-600 mb-4">
+                        <i class="fas fa-plus text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">创建内容</h3>
+                    <p class="text-sm text-gray-500">创建新的社交媒体内容</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="inline-flex p-3 rounded-lg text-white bg-green-600 mb-4">
+                        <i class="fas fa-file-alt text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">查看内容</h3>
+                    <p class="text-sm text-gray-500">管理您的所有内容</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="inline-flex p-3 rounded-lg text-white bg-purple-600 mb-4">
+                        <i class="fas fa-calendar text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">发布计划</h3>
+                    <p class="text-sm text-gray-500">查看和管理发布计划</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="inline-flex p-3 rounded-lg text-white bg-orange-600 mb-4">
+                        <i class="fas fa-chart-bar text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">数据分析</h3>
+                    <p class="text-sm text-gray-500">查看内容表现数据</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Recent Posts -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="text-lg font-medium text-gray-900">最近内容</h3>
+                        <a href="#" class="text-sm text-blue-600 hover:text-blue-500">查看全部</a>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fab fa-twitter text-blue-600"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">产品更新公告 - 新功能上线</p>
+                                    <p class="text-sm text-gray-500">2小时前 • Twitter • 已发布</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        成功
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                                        <i class="fab fa-instagram text-pink-600"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">品牌故事分享 - 我们的创业历程</p>
+                                    <p class="text-sm text-gray-500">4小时前 • Instagram • 已发布</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        成功
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fab fa-linkedin text-blue-600"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">行业洞察 - 2024年营销趋势</p>
+                                    <p class="text-sm text-gray-500">6小时前 • LinkedIn • 已发布</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        成功
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <i class="fab fa-facebook text-blue-600"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">客户案例分享 - 成功故事</p>
+                                    <p class="text-sm text-gray-500">8小时前 • Facebook • 计划中</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        待发布
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Connected Accounts -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">已连接账号</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                        <i class="fab fa-twitter text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">@mycompany</p>
+                                        <p class="text-xs text-gray-500">Twitter</p>
+                                    </div>
+                                </div>
+                                <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                                        <i class="fab fa-facebook text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">我的公司</p>
+                                        <p class="text-xs text-gray-500">Facebook</p>
+                                    </div>
+                                </div>
+                                <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center">
+                                        <i class="fab fa-instagram text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">@mycompany</p>
+                                        <p class="text-xs text-gray-500">Instagram</p>
+                                    </div>
+                                </div>
+                                <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 bg-blue-700 rounded-full flex items-center justify-center">
+                                        <i class="fab fa-linkedin text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">我的公司</p>
+                                        <p class="text-xs text-gray-500">LinkedIn</p>
+                                    </div>
+                                </div>
+                                <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-md text-sm font-medium transition duration-200">
+                            <i class="fas fa-plus mr-2"></i>连接更多账号
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Upcoming Posts -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">即将发布</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-3">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="fab fa-twitter text-blue-600 text-sm"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900">周末问候</p>
+                                    <p class="text-xs text-gray-500">今天 18:00</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="fab fa-instagram text-pink-600 text-sm"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900">产品展示</p>
+                                    <p class="text-xs text-gray-500">明天 10:00</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="fab fa-linkedin text-blue-600 text-sm"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900">行业报告</p>
+                                    <p class="text-xs text-gray-500">明天 14:00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Chart -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">本周表现</h3>
+                    </div>
+                    <div class="p-6">
+                        <canvas id="performanceChart" width="300" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function dashboardData() {
+            return {
+                init() {
+                    this.initChart();
+                },
+                initChart() {
+                    const ctx = document.getElementById('performanceChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                            datasets: [{
+                                label: '互动数',
+                                data: [120, 190, 300, 500, 200, 300, 450],
+                                borderColor: 'rgb(59, 130, 246)',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>

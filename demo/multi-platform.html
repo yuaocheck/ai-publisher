@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Publisher - 多平台发布</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .platform-card {
+            transition: all 0.3s ease;
+        }
+        .platform-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50" x-data="multiPlatformData()">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="start.html" class="flex items-center">
+                        <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">AI</span>
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-gray-900">Publisher</span>
+                    </a>
+                </div>
+                <div class="flex items-center">
+                    <a href="start.html" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-arrow-left mr-2"></i>返回首页
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="gradient-bg py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <i class="fas fa-share-alt text-blue-600 text-2xl"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-4">多平台发布</h1>
+            <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                支持 Twitter、Facebook、Instagram、LinkedIn、TikTok、YouTube 等主流平台，一次编辑，全网发布
+            </p>
+        </div>
+    </div>
+
+    <!-- Platform Grid -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Twitter/X -->
+            <div class="platform-card bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                        <i class="fab fa-twitter text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Twitter/X</h3>
+                        <p class="text-sm text-gray-500">微博客平台</p>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        280字符限制自动适配
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        话题标签智能推荐
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        图片和视频支持
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        线程发布功能
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button @click="connectPlatform('twitter')" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200">
+                        <i class="fas fa-link mr-2"></i>连接 Twitter
+                    </button>
+                </div>
+            </div>
+
+            <!-- Facebook -->
+            <div class="platform-card bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                        <i class="fab fa-facebook text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Facebook</h3>
+                        <p class="text-sm text-gray-500">社交网络平台</p>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        长文本内容支持
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        图文并茂发布
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        页面和个人账号
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        定时发布功能
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button @click="connectPlatform('facebook')" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
+                        <i class="fas fa-link mr-2"></i>连接 Facebook
+                    </button>
+                </div>
+            </div>
+
+            <!-- Instagram -->
+            <div class="platform-card bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center">
+                        <i class="fab fa-instagram text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Instagram</h3>
+                        <p class="text-sm text-gray-500">图片分享平台</p>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        视觉内容优先
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        Stories 和 Reels
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        标签丰富推荐
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        商业账号支持
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button @click="connectPlatform('instagram')" class="w-full bg-pink-500 text-white py-2 px-4 rounded-lg hover:bg-pink-600 transition duration-200">
+                        <i class="fas fa-link mr-2"></i>连接 Instagram
+                    </button>
+                </div>
+            </div>
+
+            <!-- LinkedIn -->
+            <div class="platform-card bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-blue-700 rounded-full flex items-center justify-center">
+                        <i class="fab fa-linkedin text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">LinkedIn</h3>
+                        <p class="text-sm text-gray-500">职业社交平台</p>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        专业内容发布
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        公司页面管理
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        行业洞察分享
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        B2B 营销优化
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button @click="connectPlatform('linkedin')" class="w-full bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-800 transition duration-200">
+                        <i class="fas fa-link mr-2"></i>连接 LinkedIn
+                    </button>
+                </div>
+            </div>
+
+            <!-- TikTok -->
+            <div class="platform-card bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-black rounded-full flex items-center justify-center">
+                        <i class="fab fa-tiktok text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">TikTok</h3>
+                        <p class="text-sm text-gray-500">短视频平台</p>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        短视频文案生成
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        年轻化表达风格
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        热门挑战参与
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        创意内容推荐
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button @click="connectPlatform('tiktok')" class="w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 transition duration-200">
+                        <i class="fas fa-link mr-2"></i>连接 TikTok
+                    </button>
+                </div>
+            </div>
+
+            <!-- YouTube -->
+            <div class="platform-card bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center">
+                        <i class="fab fa-youtube text-white text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">YouTube</h3>
+                        <p class="text-sm text-gray-500">视频分享平台</p>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        视频描述优化
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        SEO 关键词推荐
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        缩略图文案生成
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-check text-green-500 mr-2"></i>
+                        播放列表管理
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button @click="connectPlatform('youtube')" class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200">
+                        <i class="fas fa-link mr-2"></i>连接 YouTube
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="bg-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">多平台发布优势</h2>
+                <p class="text-xl text-gray-600">一次编辑，智能适配，全网覆盖</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-magic text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">智能适配</h3>
+                    <p class="text-gray-600">根据不同平台特性自动调整内容格式、长度和风格</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-clock text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">节省时间</h3>
+                    <p class="text-gray-600">一次创建内容，同时发布到多个平台，大幅提升工作效率</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">扩大影响</h3>
+                    <p class="text-gray-600">多平台同步发布，最大化内容曝光度和用户触达率</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connection Modal -->
+    <div x-show="showConnectionModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-900">连接平台</h2>
+                <button @click="showConnectionModal = false" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-link text-gray-400 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">连接 <span x-text="selectedPlatform"></span></h3>
+                <p class="text-gray-600">您将被重定向到 <span x-text="selectedPlatform"></span> 进行授权</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h4 class="font-medium text-blue-900 mb-2">授权权限包括：</h4>
+                    <ul class="text-sm text-blue-800 space-y-1">
+                        <li>• 发布内容到您的账号</li>
+                        <li>• 读取基本账号信息</li>
+                        <li>• 获取发布数据统计</li>
+                        <li>• 管理发布计划</li>
+                    </ul>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button @click="proceedConnection()" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+                        继续连接
+                    </button>
+                    <button @click="showConnectionModal = false" class="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded hover:bg-gray-300">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function multiPlatformData() {
+            return {
+                showConnectionModal: false,
+                selectedPlatform: '',
+                
+                connectPlatform(platform) {
+                    this.selectedPlatform = platform;
+                    this.showConnectionModal = true;
+                },
+                
+                proceedConnection() {
+                    alert(`正在连接到 ${this.selectedPlatform}...`);
+                    this.showConnectionModal = false;
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</body>
+</html>

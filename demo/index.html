@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Publisher - 全平台内容发布系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+        .social-icon:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50" x-data="appData()">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">AI</span>
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-gray-900">Publisher</span>
+                    </div>
+                    <div class="hidden md:ml-8 md:flex md:space-x-8">
+                        <a href="#home" class="text-blue-600 border-b-2 border-blue-500 px-1 pt-1 text-sm font-medium">首页</a>
+                        <a href="#features" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">功能</a>
+                        <a href="#demo" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">演示</a>
+                        <a href="#pricing" class="text-gray-500 hover:text-gray-700 px-1 pt-1 text-sm font-medium">定价</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button @click="showLogin = true" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
+                        登录
+                    </button>
+                    <button @click="showRegister = true" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                        免费试用
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="gradient-bg py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+                    一次编辑，
+                    <span class="text-yellow-300">全网智能发布</span>
+                </h1>
+                <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                    AI Publisher 是新一代全平台内容发布系统，支持文字、图片、视频自动适配并发布至全球主流社交平台。让内容创作更智能，让品牌传播更高效。
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button @click="showDemo = true" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
+                        <i class="fas fa-play mr-2"></i>观看演示
+                    </button>
+                    <button @click="showRegister = true" class="bg-yellow-400 text-gray-900 px-8 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition duration-300">
+                        <i class="fas fa-rocket mr-2"></i>立即开始
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">强大功能，简单易用</h2>
+                <p class="text-xl text-gray-600">一站式解决您的内容发布需求</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="card-hover bg-white p-6 rounded-xl shadow-lg border">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-share-alt text-blue-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">多平台发布</h3>
+                    <p class="text-gray-600">支持 Twitter、Facebook、Instagram、LinkedIn、TikTok、YouTube 等主流平台</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="card-hover bg-white p-6 rounded-xl shadow-lg border">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-robot text-green-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">AI 内容生成</h3>
+                    <p class="text-gray-600">智能生成文案、图片和视频内容，提升创作效率</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="card-hover bg-white p-6 rounded-xl shadow-lg border">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-magic text-purple-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">内容自动适配</h3>
+                    <p class="text-gray-600">根据不同平台特性自动调整内容格式和尺寸</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="card-hover bg-white p-6 rounded-xl shadow-lg border">
+                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-clock text-orange-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">定时发布</h3>
+                    <p class="text-gray-600">支持定时发布和循环发布，灵活安排内容计划</p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="card-hover bg-white p-6 rounded-xl shadow-lg border">
+                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-line text-red-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">数据分析</h3>
+                    <p class="text-gray-600">实时监控发布状态和互动数据，优化内容策略</p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="card-hover bg-white p-6 rounded-xl shadow-lg border">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-code text-indigo-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">API 接口</h3>
+                    <p class="text-gray-600">提供完整的 REST API，支持第三方系统集成</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Supported Platforms -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">支持的平台</h2>
+                <p class="text-xl text-gray-600">连接全球主流社交媒体平台</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
+                <div class="social-icon text-center">
+                    <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fab fa-twitter text-white text-2xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">Twitter/X</span>
+                </div>
+                
+                <div class="social-icon text-center">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fab fa-facebook text-white text-2xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">Facebook</span>
+                </div>
+                
+                <div class="social-icon text-center">
+                    <div class="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fab fa-instagram text-white text-2xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">Instagram</span>
+                </div>
+                
+                <div class="social-icon text-center">
+                    <div class="w-16 h-16 bg-blue-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fab fa-linkedin text-white text-2xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">LinkedIn</span>
+                </div>
+                
+                <div class="social-icon text-center">
+                    <div class="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fab fa-tiktok text-white text-2xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">TikTok</span>
+                </div>
+                
+                <div class="social-icon text-center">
+                    <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fab fa-youtube text-white text-2xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">YouTube</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">产品演示</h2>
+                <p class="text-xl text-gray-600">看看 AI Publisher 如何简化您的内容发布流程</p>
+            </div>
+            
+            <div class="bg-gray-900 rounded-xl overflow-hidden shadow-2xl">
+                <div class="bg-gray-800 px-4 py-2 flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span class="text-gray-400 text-sm ml-4">AI Publisher Dashboard</span>
+                </div>
+                <div class="p-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Dashboard Stats -->
+                        <div class="lg:col-span-2">
+                            <h3 class="text-white text-lg font-semibold mb-4">控制台概览</h3>
+                            <div class="grid grid-cols-2 gap-4 mb-6">
+                                <div class="bg-blue-600 p-4 rounded-lg">
+                                    <div class="text-blue-100 text-sm">总内容数</div>
+                                    <div class="text-white text-2xl font-bold">1,234</div>
+                                    <div class="text-blue-200 text-xs">+12% 本月</div>
+                                </div>
+                                <div class="bg-green-600 p-4 rounded-lg">
+                                    <div class="text-green-100 text-sm">已发布</div>
+                                    <div class="text-white text-2xl font-bold">987</div>
+                                    <div class="text-green-200 text-xs">+8% 本月</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Recent Posts -->
+                            <div class="bg-gray-800 rounded-lg p-4">
+                                <h4 class="text-white font-medium mb-3">最近发布</h4>
+                                <div class="space-y-3">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                            <i class="fab fa-twitter text-white text-sm"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="text-white text-sm">产品更新公告</div>
+                                            <div class="text-gray-400 text-xs">2小时前 • 已发布</div>
+                                        </div>
+                                        <div class="text-green-400 text-xs">✓</div>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center">
+                                            <i class="fab fa-instagram text-white text-sm"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="text-white text-sm">品牌故事分享</div>
+                                            <div class="text-gray-400 text-xs">4小时前 • 已发布</div>
+                                        </div>
+                                        <div class="text-green-400 text-xs">✓</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div>
+                            <h3 class="text-white text-lg font-semibold mb-4">快速操作</h3>
+                            <div class="space-y-3">
+                                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg text-left transition duration-200">
+                                    <i class="fas fa-plus mr-2"></i>创建内容
+                                </button>
+                                <button class="w-full bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg text-left transition duration-200">
+                                    <i class="fas fa-calendar mr-2"></i>查看计划
+                                </button>
+                                <button class="w-full bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg text-left transition duration-200">
+                                    <i class="fas fa-chart-bar mr-2"></i>数据分析
+                                </button>
+                                <button class="w-full bg-gray-700 hover:bg-gray-600 text-white p-3 rounded-lg text-left transition duration-200">
+                                    <i class="fas fa-link mr-2"></i>连接账号
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">选择适合您的方案</h2>
+                <p class="text-xl text-gray-600">灵活的定价，满足不同规模的需求</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Free Plan -->
+                <div class="bg-white rounded-xl shadow-lg p-8 border">
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">免费版</h3>
+                        <div class="text-3xl font-bold text-gray-900 mb-4">¥0<span class="text-sm font-normal text-gray-600">/月</span></div>
+                        <p class="text-gray-600 mb-6">适合个人用户和小型团队</p>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>3个社交账号</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>每月50条发布</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>基础分析</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>邮件支持</li>
+                    </ul>
+                    <button class="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 transition duration-200">
+                        开始使用
+                    </button>
+                </div>
+
+                <!-- Pro Plan -->
+                <div class="bg-white rounded-xl shadow-lg p-8 border-2 border-blue-500 relative">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">推荐</span>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">专业版</h3>
+                        <div class="text-3xl font-bold text-gray-900 mb-4">¥99<span class="text-sm font-normal text-gray-600">/月</span></div>
+                        <p class="text-gray-600 mb-6">适合中小企业和营销团队</p>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>10个社交账号</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>每月500条发布</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>AI内容生成</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>高级分析</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>优先支持</li>
+                    </ul>
+                    <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition duration-200">
+                        立即购买
+                    </button>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="bg-white rounded-xl shadow-lg p-8 border">
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">企业版</h3>
+                        <div class="text-3xl font-bold text-gray-900 mb-4">¥299<span class="text-sm font-normal text-gray-600">/月</span></div>
+                        <p class="text-gray-600 mb-6">适合大型企业和代理机构</p>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>无限社交账号</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>无限发布</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>定制AI模型</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>企业级分析</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>专属客服</li>
+                    </ul>
+                    <button class="w-full bg-gray-800 text-white py-2 px-4 rounded-lg font-medium hover:bg-gray-700 transition duration-200">
+                        联系销售
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">AI</span>
+                        </div>
+                        <span class="ml-2 text-xl font-bold">Publisher</span>
+                    </div>
+                    <p class="text-gray-400">让内容创作更智能，让品牌传播更高效。</p>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-4">产品</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">功能特性</a></li>
+                        <li><a href="#" class="hover:text-white">定价方案</a></li>
+                        <li><a href="#" class="hover:text-white">API 文档</a></li>
+                        <li><a href="#" class="hover:text-white">更新日志</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-4">支持</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">帮助中心</a></li>
+                        <li><a href="#" class="hover:text-white">联系我们</a></li>
+                        <li><a href="#" class="hover:text-white">状态页面</a></li>
+                        <li><a href="#" class="hover:text-white">社区论坛</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-4">公司</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">关于我们</a></li>
+                        <li><a href="#" class="hover:text-white">招聘信息</a></li>
+                        <li><a href="#" class="hover:text-white">隐私政策</a></li>
+                        <li><a href="#" class="hover:text-white">服务条款</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 AI Publisher. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div x-show="showLogin" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">登录</h2>
+                <button @click="showLogin = false" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">邮箱地址</label>
+                    <input type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+                    <input type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200">
+                    登录
+                </button>
+            </form>
+            <div class="mt-4 text-center">
+                <a href="#" class="text-sm text-blue-600 hover:text-blue-500">忘记密码？</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div x-show="showRegister" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">注册</h2>
+                <button @click="showRegister = false" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">姓名</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">邮箱地址</label>
+                    <input type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+                    <input type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200">
+                    创建账户
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Demo Modal -->
+    <div x-show="showDemo" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-4xl w-full mx-4 max-h-screen overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">产品演示</h2>
+                <button @click="showDemo = false" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="aspect-video bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                <div class="text-center">
+                    <i class="fas fa-play-circle text-6xl text-blue-600 mb-4"></i>
+                    <p class="text-gray-600">点击播放演示视频</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-2">主要功能演示</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li>• 用户注册与组织创建</li>
+                        <li>• 社交账号连接</li>
+                        <li>• 内容创建与编辑</li>
+                        <li>• 多平台发布</li>
+                        <li>• 数据分析查看</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-2">技术特点</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li>• Next.js 14 + TypeScript</li>
+                        <li>• Supabase 数据库</li>
+                        <li>• OAuth 2.0 集成</li>
+                        <li>• 响应式设计</li>
+                        <li>• 实时数据同步</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function appData() {
+            return {
+                showLogin: false,
+                showRegister: false,
+                showDemo: false
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</body>
+</html>

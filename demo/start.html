@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Publisher - 演示导航</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <div class="gradient-bg py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex items-center justify-center mb-6">
+                <div class="h-16 w-16 bg-white rounded-xl flex items-center justify-center shadow-lg">
+                    <span class="text-2xl font-bold text-blue-600">AI</span>
+                </div>
+                <span class="ml-4 text-4xl font-bold text-white">Publisher</span>
+            </div>
+            <h1 class="text-3xl font-bold text-white mb-4">
+                🎯 完整演示导航
+            </h1>
+            <p class="text-xl text-blue-100 mb-8">
+                体验 AI Publisher 的完整功能，无需安装任何软件
+            </p>
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 inline-block">
+                <p class="text-white text-sm">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    这是一个静态 HTML 演示版本，展示了项目的完整界面和交互效果
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Cards -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Landing Page -->
+            <a href="index.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-home text-blue-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">产品首页</h3>
+                <p class="text-gray-600 mb-4">查看产品介绍、功能特性和定价方案</p>
+                <div class="flex items-center text-blue-600 text-sm font-medium">
+                    <span>访问首页</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- Multi-Platform Publishing -->
+            <a href="multi-platform.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block">
+                <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-share-alt text-indigo-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">多平台发布</h3>
+                <p class="text-gray-600 mb-4">支持 Twitter、Facebook、Instagram、LinkedIn 等主流平台</p>
+                <div class="flex items-center text-indigo-600 text-sm font-medium">
+                    <span>查看详情</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- AI Content Generation -->
+            <a href="simple-ai.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-robot text-purple-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">AI 内容生成</h3>
+                <p class="text-gray-600 mb-4">使用真实 Gemini AI 智能生成高质量内容</p>
+                <div class="flex items-center text-purple-600 text-sm font-medium">
+                    <span>体验 AI</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- Multimodal AI -->
+            <a href="ai-multimodal.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-magic text-green-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">多模态 AI</h3>
+                <p class="text-gray-600 mb-4">文本、图片、视频多模态内容生成</p>
+                <div class="flex items-center text-green-600 text-sm font-medium">
+                    <span>多模态生成</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- Real Image Generator -->
+            <a href="real-image-generator.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block border-2 border-green-200">
+                <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-image text-white text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">真实图片生成器 🎨</h3>
+                <p class="text-gray-600 mb-4">生成高质量、可下载的真实图片</p>
+                <div class="flex items-center text-green-600 text-sm font-medium">
+                    <span>生成图片</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- Real Video Generator -->
+            <a href="real-video-generator.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block border-2 border-purple-200">
+                <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-red-500 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-video text-white text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">真实视频生成器 🎬</h3>
+                <p class="text-gray-600 mb-4">生成高质量、可播放的真实视频</p>
+                <div class="flex items-center text-purple-600 text-sm font-medium">
+                    <span>生成视频</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- Real Media Generator -->
+            <a href="ai-media-generator.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block border-2 border-yellow-200">
+                <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-wand-magic-sparkles text-white text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">多模态生成器 ⭐</h3>
+                <p class="text-gray-600 mb-4">文本、图片、视频一站式生成</p>
+                <div class="flex items-center text-purple-600 text-sm font-medium">
+                    <span>全能生成</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- Social Publisher -->
+            <a href="social-publisher.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block border-2 border-blue-200">
+                <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-share-alt text-white text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">多平台社交发布 🚀</h3>
+                <p class="text-gray-600 mb-4">连接真实社交平台，一键发布内容</p>
+                <div class="flex items-center text-blue-600 text-sm font-medium">
+                    <span>立即发布</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- API Testing -->
+            <a href="gemini-test.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block">
+                <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-flask text-orange-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">API 测试工具</h3>
+                <p class="text-gray-600 mb-4">测试和调试 Gemini API 调用</p>
+                <div class="flex items-center text-orange-600 text-sm font-medium">
+                    <span>测试 API</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- Content Adaptation -->
+            <a href="content-adaptation.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block">
+                <div class="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-magic text-pink-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">内容自动适配</h3>
+                <p class="text-gray-600 mb-4">根据不同平台特性自动调整内容格式和尺寸</p>
+                <div class="flex items-center text-pink-600 text-sm font-medium">
+                    <span>查看演示</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- Dashboard -->
+            <a href="dashboard.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-tachometer-alt text-green-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">控制台</h3>
+                <p class="text-gray-600 mb-4">查看数据统计、最近内容和快速操作</p>
+                <div class="flex items-center text-green-600 text-sm font-medium">
+                    <span>进入控制台</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- Scheduled Publishing -->
+            <a href="scheduled-publishing.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block">
+                <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-clock text-orange-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">定时发布</h3>
+                <p class="text-gray-600 mb-4">支持定时发布和循环发布，灵活安排内容计划</p>
+                <div class="flex items-center text-orange-600 text-sm font-medium">
+                    <span>设置计划</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- Analytics -->
+            <a href="analytics.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block">
+                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-chart-line text-red-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">数据分析</h3>
+                <p class="text-gray-600 mb-4">实时监控发布状态和互动数据，优化内容策略</p>
+                <div class="flex items-center text-red-600 text-sm font-medium">
+                    <span>查看数据</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- API Interface -->
+            <a href="api-interface.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block">
+                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-code text-gray-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">API 接口</h3>
+                <p class="text-gray-600 mb-4">提供完整的 REST API，支持第三方系统集成</p>
+                <div class="flex items-center text-gray-600 text-sm font-medium">
+                    <span>查看文档</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- Social Accounts -->
+            <a href="accounts.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-link text-purple-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">社交账号</h3>
+                <p class="text-gray-600 mb-4">管理已连接的社交媒体账号和连接新平台</p>
+                <div class="flex items-center text-purple-600 text-sm font-medium">
+                    <span>管理账号</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- Create Post -->
+            <a href="create-post.html" class="card-hover bg-white rounded-xl shadow-lg p-6 block">
+                <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-plus text-orange-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">创建内容</h3>
+                <p class="text-gray-600 mb-4">使用富文本编辑器创建和发布内容</p>
+                <div class="flex items-center text-orange-600 text-sm font-medium">
+                    <span>创建内容</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </a>
+
+            <!-- API Documentation -->
+            <div class="card-hover bg-white rounded-xl shadow-lg p-6">
+                <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-code text-indigo-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">API 文档</h3>
+                <p class="text-gray-600 mb-4">查看完整的 API 接口文档和示例</p>
+                <div class="flex items-center text-gray-400 text-sm font-medium">
+                    <span>开发中...</span>
+                    <i class="fas fa-clock ml-2"></i>
+                </div>
+            </div>
+
+            <!-- Analytics -->
+            <div class="card-hover bg-white rounded-xl shadow-lg p-6">
+                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
+                    <i class="fas fa-chart-bar text-red-600 text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">数据分析</h3>
+                <p class="text-gray-600 mb-4">查看内容表现和互动数据分析</p>
+                <div class="flex items-center text-gray-400 text-sm font-medium">
+                    <span>开发中...</span>
+                    <i class="fas fa-clock ml-2"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Overview -->
+    <div class="bg-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">演示功能概览</h2>
+                <p class="text-xl text-gray-600">这个 HTML 演示版本包含了以下功能</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-plus text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">用户认证</h3>
+                    <p class="text-sm text-gray-600">注册、登录、组织管理</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-share-alt text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">多平台发布</h3>
+                    <p class="text-sm text-gray-600">支持主流社交媒体平台</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-robot text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">AI 功能</h3>
+                    <p class="text-sm text-gray-600">智能内容生成和优化</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-orange-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">数据分析</h3>
+                    <p class="text-sm text-gray-600">实时监控和性能分析</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technical Info -->
+    <div class="bg-gray-100 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">技术实现</h2>
+                <p class="text-xl text-gray-600">基于现代化技术栈构建</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-lg p-6 text-center">
+                    <i class="fab fa-js-square text-4xl text-yellow-500 mb-4"></i>
+                    <h3 class="font-semibold text-gray-900 mb-2">前端技术</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>Next.js 14 + TypeScript</li>
+                        <li>Tailwind CSS</li>
+                        <li>Alpine.js (演示版)</li>
+                        <li>响应式设计</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-lg p-6 text-center">
+                    <i class="fas fa-server text-4xl text-blue-500 mb-4"></i>
+                    <h3 class="font-semibold text-gray-900 mb-2">后端技术</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>Supabase 数据库</li>
+                        <li>Next.js API Routes</li>
+                        <li>OAuth 2.0 集成</li>
+                        <li>实时数据同步</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-lg p-6 text-center">
+                    <i class="fas fa-cloud text-4xl text-green-500 mb-4"></i>
+                    <h3 class="font-semibold text-gray-900 mb-2">部署方案</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>Cloudflare Workers</li>
+                        <li>全球 CDN 加速</li>
+                        <li>自动扩展</li>
+                        <li>高可用性</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex items-center justify-center mb-4">
+                <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">AI</span>
+                </div>
+                <span class="ml-2 text-xl font-bold">Publisher</span>
+            </div>
+            <p class="text-gray-400 mb-4">让内容创作更智能，让品牌传播更高效</p>
+            <div class="flex justify-center space-x-6 text-sm text-gray-400">
+                <a href="#" class="hover:text-white">GitHub</a>
+                <a href="#" class="hover:text-white">文档</a>
+                <a href="#" class="hover:text-white">支持</a>
+                <a href="#" class="hover:text-white">联系我们</a>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-800 text-sm text-gray-500">
+                <p>&copy; 2024 AI Publisher. All rights reserved. | 这是一个演示版本</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

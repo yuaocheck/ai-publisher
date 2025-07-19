@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Publisher - API 接口</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .api-card {
+            transition: all 0.3s ease;
+        }
+        .api-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .method-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+        }
+        .method-get { background-color: #10b981; color: white; }
+        .method-post { background-color: #3b82f6; color: white; }
+        .method-put { background-color: #f59e0b; color: white; }
+        .method-delete { background-color: #ef4444; color: white; }
+        
+        pre[class*="language-"] {
+            margin: 0;
+            border-radius: 0.5rem;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50" x-data="apiInterfaceData()">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="start.html" class="flex items-center">
+                        <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">AI</span>
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-gray-900">Publisher</span>
+                    </a>
+                </div>
+                <div class="flex items-center">
+                    <a href="start.html" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-arrow-left mr-2"></i>返回首页
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="gradient-bg py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <i class="fas fa-code text-blue-600 text-2xl"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-4">API 接口</h1>
+            <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                提供完整的 REST API，支持第三方系统集成
+            </p>
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 inline-block">
+                <p class="text-white text-sm">
+                    <i class="fas fa-shield-alt mr-2"></i>
+                    安全认证 • RESTful 设计 • 完整文档
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Documentation -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <!-- Quick Start -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">快速开始</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">获取 API 密钥</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-blue-600 font-bold text-sm">1</span>
+                            </div>
+                            <span class="text-sm text-gray-700">注册 AI Publisher 账号</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-blue-600 font-bold text-sm">2</span>
+                            </div>
+                            <span class="text-sm text-gray-700">进入开发者设置页面</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-blue-600 font-bold text-sm">3</span>
+                            </div>
+                            <span class="text-sm text-gray-700">生成新的 API 密钥</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">认证方式</h3>
+                    <div class="bg-gray-900 rounded-lg p-4">
+                        <pre><code class="language-bash">curl -X GET "https://api.aipublisher.com/v1/posts" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"</code></pre>
+                    </div>
+                    <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div class="flex">
+                            <i class="fas fa-exclamation-triangle text-yellow-600 mt-0.5 mr-2"></i>
+                            <div class="text-sm text-yellow-800">
+                                <strong>重要：</strong>请妥善保管您的 API 密钥，不要在客户端代码中暴露。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Endpoints -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">API 端点</h2>
+            
+            <!-- Tabs -->
+            <div class="border-b border-gray-200 mb-6">
+                <nav class="-mb-px flex space-x-8">
+                    <template x-for="category in apiCategories" :key="category.id">
+                        <button 
+                            @click="activeCategory = category.id"
+                            :class="activeCategory === category.id ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                            class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
+                            x-text="category.name"
+                        ></button>
+                    </template>
+                </nav>
+            </div>
+
+            <!-- API Endpoints Content -->
+            <div class="space-y-6">
+                <template x-for="endpoint in getEndpointsByCategory(activeCategory)" :key="endpoint.id">
+                    <div class="api-card border border-gray-200 rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <span :class="'method-' + endpoint.method.toLowerCase()" class="method-badge" x-text="endpoint.method"></span>
+                                <code class="text-sm font-mono text-gray-700" x-text="endpoint.path"></code>
+                            </div>
+                            <button @click="toggleEndpoint(endpoint.id)" class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2" x-text="endpoint.title"></h3>
+                        <p class="text-gray-600 mb-4" x-text="endpoint.description"></p>
+                        
+                        <div x-show="expandedEndpoints.includes(endpoint.id)" class="space-y-4">
+                            <!-- Parameters -->
+                            <div x-show="endpoint.parameters && endpoint.parameters.length > 0">
+                                <h4 class="font-medium text-gray-900 mb-2">参数</h4>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">参数名</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">类型</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">必需</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">描述</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            <template x-for="param in endpoint.parameters" :key="param.name">
+                                                <tr>
+                                                    <td class="px-4 py-2 text-sm font-mono text-gray-900" x-text="param.name"></td>
+                                                    <td class="px-4 py-2 text-sm text-gray-600" x-text="param.type"></td>
+                                                    <td class="px-4 py-2 text-sm">
+                                                        <span :class="param.required ? 'text-red-600' : 'text-gray-400'" x-text="param.required ? '是' : '否'"></span>
+                                                    </td>
+                                                    <td class="px-4 py-2 text-sm text-gray-600" x-text="param.description"></td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Request Example -->
+                            <div>
+                                <h4 class="font-medium text-gray-900 mb-2">请求示例</h4>
+                                <div class="bg-gray-900 rounded-lg p-4">
+                                    <pre><code :class="'language-' + endpoint.requestExample.language" x-text="endpoint.requestExample.code"></code></pre>
+                                </div>
+                            </div>
+                            
+                            <!-- Response Example -->
+                            <div>
+                                <h4 class="font-medium text-gray-900 mb-2">响应示例</h4>
+                                <div class="bg-gray-900 rounded-lg p-4">
+                                    <pre><code class="language-json" x-text="endpoint.responseExample"></code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- SDK and Libraries -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">SDK 和库</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <template x-for="sdk in sdks" :key="sdk.name">
+                    <div class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                        <div class="flex items-center mb-4">
+                            <i :class="sdk.icon" class="text-2xl mr-3" :style="'color: ' + sdk.color"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-900" x-text="sdk.name"></h3>
+                                <p class="text-sm text-gray-500" x-text="sdk.version"></p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4" x-text="sdk.description"></p>
+                        <div class="space-y-2">
+                            <a :href="sdk.github" class="flex items-center text-sm text-blue-600 hover:text-blue-800">
+                                <i class="fab fa-github mr-2"></i>GitHub
+                            </a>
+                            <a :href="sdk.docs" class="flex items-center text-sm text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-book mr-2"></i>文档
+                            </a>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Rate Limits -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">速率限制</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center p-6 bg-gray-50 rounded-lg">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">1,000</div>
+                    <div class="text-sm text-gray-600">免费版</div>
+                    <div class="text-xs text-gray-500 mt-1">每小时请求数</div>
+                </div>
+                
+                <div class="text-center p-6 bg-gray-50 rounded-lg">
+                    <div class="text-3xl font-bold text-green-600 mb-2">10,000</div>
+                    <div class="text-sm text-gray-600">专业版</div>
+                    <div class="text-xs text-gray-500 mt-1">每小时请求数</div>
+                </div>
+                
+                <div class="text-center p-6 bg-gray-50 rounded-lg">
+                    <div class="text-3xl font-bold text-purple-600 mb-2">无限制</div>
+                    <div class="text-sm text-gray-600">企业版</div>
+                    <div class="text-xs text-gray-500 mt-1">联系我们定制</div>
+                </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div class="flex">
+                    <i class="fas fa-info-circle text-blue-600 mt-0.5 mr-2"></i>
+                    <div class="text-sm text-blue-800">
+                        <strong>提示：</strong>当达到速率限制时，API 将返回 429 状态码。建议在应用中实现适当的重试机制。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function apiInterfaceData() {
+            return {
+                activeCategory: 'posts',
+                expandedEndpoints: [],
+                
+                apiCategories: [
+                    { id: 'posts', name: '内容发布' },
+                    { id: 'analytics', name: '数据分析' },
+                    { id: 'platforms', name: '平台管理' },
+                    { id: 'users', name: '用户管理' }
+                ],
+                
+                endpoints: [
+                    {
+                        id: 'create-post',
+                        category: 'posts',
+                        method: 'POST',
+                        path: '/v1/posts',
+                        title: '创建发布内容',
+                        description: '创建新的内容并发布到指定平台',
+                        parameters: [
+                            { name: 'content', type: 'string', required: true, description: '发布内容' },
+                            { name: 'platforms', type: 'array', required: true, description: '目标平台列表' },
+                            { name: 'schedule_time', type: 'datetime', required: false, description: '定时发布时间' }
+                        ],
+                        requestExample: {
+                            language: 'json',
+                            code: `{
+  "content": "这是一条测试内容",
+  "platforms": ["twitter", "facebook"],
+  "schedule_time": "2024-01-15T09:00:00Z"
+}`
+                        },
+                        responseExample: `{
+  "id": "post_123456",
+  "status": "scheduled",
+  "platforms": ["twitter", "facebook"],
+  "created_at": "2024-01-14T10:30:00Z"
+}`
+                    },
+                    {
+                        id: 'get-posts',
+                        category: 'posts',
+                        method: 'GET',
+                        path: '/v1/posts',
+                        title: '获取发布列表',
+                        description: '获取用户的所有发布内容',
+                        parameters: [
+                            { name: 'page', type: 'integer', required: false, description: '页码' },
+                            { name: 'limit', type: 'integer', required: false, description: '每页数量' },
+                            { name: 'status', type: 'string', required: false, description: '状态筛选' }
+                        ],
+                        requestExample: {
+                            language: 'bash',
+                            code: `curl -X GET "https://api.aipublisher.com/v1/posts?page=1&limit=10" \\
+  -H "Authorization: Bearer YOUR_API_KEY"`
+                        },
+                        responseExample: `{
+  "data": [
+    {
+      "id": "post_123456",
+      "content": "这是一条测试内容",
+      "status": "published",
+      "platforms": ["twitter", "facebook"],
+      "created_at": "2024-01-14T10:30:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 50
+  }
+}`
+                    },
+                    {
+                        id: 'get-analytics',
+                        category: 'analytics',
+                        method: 'GET',
+                        path: '/v1/analytics',
+                        title: '获取分析数据',
+                        description: '获取内容的分析数据和统计信息',
+                        parameters: [
+                            { name: 'start_date', type: 'date', required: true, description: '开始日期' },
+                            { name: 'end_date', type: 'date', required: true, description: '结束日期' },
+                            { name: 'platform', type: 'string', required: false, description: '平台筛选' }
+                        ],
+                        requestExample: {
+                            language: 'bash',
+                            code: `curl -X GET "https://api.aipublisher.com/v1/analytics?start_date=2024-01-01&end_date=2024-01-31" \\
+  -H "Authorization: Bearer YOUR_API_KEY"`
+                        },
+                        responseExample: `{
+  "total_posts": 128,
+  "total_engagements": 5842,
+  "avg_engagement_rate": 4.2,
+  "platform_breakdown": {
+    "twitter": { "posts": 45, "engagements": 2100 },
+    "facebook": { "posts": 38, "engagements": 1800 }
+  }
+}`
+                    }
+                ],
+                
+                sdks: [
+                    {
+                        name: 'JavaScript SDK',
+                        version: 'v1.2.0',
+                        description: '适用于 Node.js 和浏览器环境的 JavaScript SDK',
+                        icon: 'fab fa-js-square',
+                        color: '#F7DF1E',
+                        github: '#',
+                        docs: '#'
+                    },
+                    {
+                        name: 'Python SDK',
+                        version: 'v1.1.0',
+                        description: '适用于 Python 应用的官方 SDK',
+                        icon: 'fab fa-python',
+                        color: '#3776AB',
+                        github: '#',
+                        docs: '#'
+                    },
+                    {
+                        name: 'PHP SDK',
+                        version: 'v1.0.0',
+                        description: '适用于 PHP 应用的轻量级 SDK',
+                        icon: 'fab fa-php',
+                        color: '#777BB4',
+                        github: '#',
+                        docs: '#'
+                    }
+                ],
+                
+                getEndpointsByCategory(category) {
+                    return this.endpoints.filter(endpoint => endpoint.category === category);
+                },
+                
+                toggleEndpoint(endpointId) {
+                    const index = this.expandedEndpoints.indexOf(endpointId);
+                    if (index > -1) {
+                        this.expandedEndpoints.splice(index, 1);
+                    } else {
+                        this.expandedEndpoints.push(endpointId);
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</body>
+</html>

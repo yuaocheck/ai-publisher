@@ -1,0 +1,90 @@
+name = "ai-publisher"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Production environment
+[env.production]
+name = "ai-publisher-prod"
+route = "ai-publisher.com/*"
+
+# Staging environment
+[env.staging]
+name = "ai-publisher-staging"
+route = "staging.ai-publisher.com/*"
+
+# Environment variables (set via wrangler secret)
+# These should be set using: wrangler secret put VARIABLE_NAME
+[vars]
+NODE_ENV = "production"
+NEXTAUTH_URL = "https://ai-publisher.com"
+APP_NAME = "AI Publisher"
+APP_VERSION = "1.0.0"
+AUTO_DEPLOY = "true"
+WORKER_NAME = "ai-publisher"
+
+# KV namespaces for caching
+[[kv_namespaces]]
+binding = "CACHE"
+id = "your-kv-namespace-id"
+preview_id = "your-preview-kv-namespace-id"
+
+# D1 database (if using Cloudflare D1 instead of Supabase)
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "ai-publisher-db"
+# database_id = "your-d1-database-id"
+
+# R2 bucket for media storage
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "ai-publisher-media"
+
+# Analytics Engine for custom metrics
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+
+# Durable Objects (for real-time features)
+[[durable_objects.bindings]]
+name = "SCHEDULER"
+class_name = "SchedulerDurableObject"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["SchedulerDurableObject"]
+
+# Build configuration
+[build]
+command = "npm run build"
+cwd = "."
+
+# Pages configuration (for static assets)
+[pages]
+build_output_dir = "out"
+compatibility_date = "2024-01-01"
+
+# Custom domains
+[[routes]]
+pattern = "ai-publisher.com/*"
+zone_name = "ai-publisher.com"
+
+[[routes]]
+pattern = "www.ai-publisher.com/*"
+zone_name = "ai-publisher.com"
+
+# Rate limiting
+[limits]
+cpu_ms = 50000
+
+# Cron triggers for background tasks
+[[triggers.crons]]
+cron = "0 */6 * * *"  # Every 6 hours
+name = "token-refresh"
+
+[[triggers.crons]]
+cron = "0 0 * * *"    # Daily at midnight
+name = "cleanup-tasks"
+
+[[triggers.crons]]
+cron = "*/15 * * * *" # Every 15 minutes
+name = "process-queue"

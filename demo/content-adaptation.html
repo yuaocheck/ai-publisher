@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Publisher - 内容自动适配</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .platform-preview {
+            transition: all 0.3s ease;
+        }
+        .platform-preview:hover {
+            transform: scale(1.02);
+        }
+        .typing-effect {
+            overflow: hidden;
+            border-right: 2px solid #667eea;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #667eea }
+        }
+    </style>
+</head>
+<body class="bg-gray-50" x-data="contentAdaptationData()">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="start.html" class="flex items-center">
+                        <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">AI</span>
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-gray-900">Publisher</span>
+                    </a>
+                </div>
+                <div class="flex items-center">
+                    <a href="start.html" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-arrow-left mr-2"></i>返回首页
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="gradient-bg py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <i class="fas fa-magic text-blue-600 text-2xl"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-4">内容自动适配</h1>
+            <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                根据不同平台特性自动调整内容格式和尺寸
+            </p>
+        </div>
+    </div>
+
+    <!-- Demo Section -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <!-- Input Section -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-12">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">智能适配演示</h2>
+                <p class="text-gray-600">输入原始内容，看看 AI 如何为不同平台自动适配</p>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">原始内容</label>
+                    <textarea 
+                        x-model="originalContent"
+                        rows="4" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="输入您的原始内容..."
+                    ></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">内容类型</label>
+                        <select x-model="contentType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="announcement">产品公告</option>
+                            <option value="promotion">促销活动</option>
+                            <option value="education">教育内容</option>
+                            <option value="entertainment">娱乐内容</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">目标受众</label>
+                        <select x-model="targetAudience" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="general">一般用户</option>
+                            <option value="business">商务人士</option>
+                            <option value="young">年轻用户</option>
+                            <option value="professional">专业人士</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button 
+                        @click="adaptContent()"
+                        :disabled="!originalContent.trim() || adapting"
+                        class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-lg font-medium transition duration-200"
+                    >
+                        <span x-show="!adapting">
+                            <i class="fas fa-magic mr-2"></i>智能适配
+                        </span>
+                        <span x-show="adapting">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>正在适配中...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Platform Previews -->
+        <div x-show="adaptedContent.length > 0" class="space-y-8">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">适配结果</h2>
+                <p class="text-gray-600">同一内容在不同平台的智能适配效果</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Twitter Preview -->
+                <div class="platform-preview bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-blue-500 text-white p-4 flex items-center">
+                        <i class="fab fa-twitter text-xl mr-3"></i>
+                        <div>
+                            <h3 class="font-semibold">Twitter</h3>
+                            <p class="text-sm opacity-90">280字符限制</p>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-start space-x-3">
+                            <img src="https://via.placeholder.com/40x40" alt="Avatar" class="w-10 h-10 rounded-full">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="font-bold text-sm">我的公司</span>
+                                    <span class="text-gray-500 text-sm">@mycompany</span>
+                                    <span class="text-gray-500 text-sm">·</span>
+                                    <span class="text-gray-500 text-sm">现在</span>
+                                </div>
+                                <div class="text-sm" x-text="getAdaptedContent('twitter')"></div>
+                                <div class="mt-3 flex items-center space-x-6 text-gray-500">
+                                    <div class="flex items-center space-x-1">
+                                        <i class="far fa-comment"></i>
+                                        <span class="text-xs">12</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <i class="fas fa-retweet"></i>
+                                        <span class="text-xs">5</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <i class="far fa-heart"></i>
+                                        <span class="text-xs">23</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Facebook Preview -->
+                <div class="platform-preview bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-blue-600 text-white p-4 flex items-center">
+                        <i class="fab fa-facebook text-xl mr-3"></i>
+                        <div>
+                            <h3 class="font-semibold">Facebook</h3>
+                            <p class="text-sm opacity-90">长文本支持</p>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-start space-x-3">
+                            <img src="https://via.placeholder.com/40x40" alt="Avatar" class="w-10 h-10 rounded-full">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="font-bold text-sm">我的公司</span>
+                                    <span class="text-gray-500 text-sm">·</span>
+                                    <span class="text-gray-500 text-sm">刚刚</span>
+                                </div>
+                                <div class="text-sm" x-text="getAdaptedContent('facebook')"></div>
+                                <div class="mt-3 flex items-center space-x-6 text-gray-500 text-sm">
+                                    <div class="flex items-center space-x-1">
+                                        <i class="far fa-thumbs-up"></i>
+                                        <span>赞</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <i class="far fa-comment"></i>
+                                        <span>评论</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <i class="fas fa-share"></i>
+                                        <span>分享</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instagram Preview -->
+                <div class="platform-preview bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-pink-500 text-white p-4 flex items-center">
+                        <i class="fab fa-instagram text-xl mr-3"></i>
+                        <div>
+                            <h3 class="font-semibold">Instagram</h3>
+                            <p class="text-sm opacity-90">视觉优先</p>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="bg-gray-200 h-48 rounded-lg mb-3 flex items-center justify-center">
+                            <i class="fas fa-image text-gray-400 text-2xl"></i>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <img src="https://via.placeholder.com/32x32" alt="Avatar" class="w-8 h-8 rounded-full">
+                            <div class="flex-1">
+                                <div class="text-sm">
+                                    <span class="font-bold">mycompany</span>
+                                    <span x-text="getAdaptedContent('instagram')"></span>
+                                </div>
+                                <div class="mt-2 flex items-center space-x-4 text-gray-500">
+                                    <i class="far fa-heart"></i>
+                                    <i class="far fa-comment"></i>
+                                    <i class="far fa-paper-plane"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LinkedIn Preview -->
+                <div class="platform-preview bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-blue-700 text-white p-4 flex items-center">
+                        <i class="fab fa-linkedin text-xl mr-3"></i>
+                        <div>
+                            <h3 class="font-semibold">LinkedIn</h3>
+                            <p class="text-sm opacity-90">专业内容</p>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-start space-x-3">
+                            <img src="https://via.placeholder.com/40x40" alt="Avatar" class="w-10 h-10 rounded-full">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="font-bold text-sm">我的公司</span>
+                                    <span class="text-gray-500 text-sm">·</span>
+                                    <span class="text-gray-500 text-sm">1小时</span>
+                                </div>
+                                <div class="text-sm" x-text="getAdaptedContent('linkedin')"></div>
+                                <div class="mt-3 flex items-center space-x-6 text-gray-500 text-sm">
+                                    <div class="flex items-center space-x-1">
+                                        <i class="far fa-thumbs-up"></i>
+                                        <span>赞</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <i class="far fa-comment"></i>
+                                        <span>评论</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <i class="fas fa-share"></i>
+                                        <span>分享</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TikTok Preview -->
+                <div class="platform-preview bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-black text-white p-4 flex items-center">
+                        <i class="fab fa-tiktok text-xl mr-3"></i>
+                        <div>
+                            <h3 class="font-semibold">TikTok</h3>
+                            <p class="text-sm opacity-90">短视频文案</p>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="bg-gray-900 h-48 rounded-lg mb-3 flex items-center justify-center relative">
+                            <i class="fas fa-play text-white text-2xl"></i>
+                            <div class="absolute bottom-2 left-2 right-2">
+                                <div class="text-white text-xs" x-text="getAdaptedContent('tiktok')"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <i class="far fa-heart text-red-500"></i>
+                                <i class="far fa-comment"></i>
+                                <i class="fas fa-share"></i>
+                            </div>
+                            <div class="text-xs text-gray-500">@mycompany</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YouTube Preview -->
+                <div class="platform-preview bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-red-600 text-white p-4 flex items-center">
+                        <i class="fab fa-youtube text-xl mr-3"></i>
+                        <div>
+                            <h3 class="font-semibold">YouTube</h3>
+                            <p class="text-sm opacity-90">视频描述</p>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="bg-gray-200 h-32 rounded-lg mb-3 flex items-center justify-center">
+                            <i class="fas fa-play text-gray-400 text-xl"></i>
+                        </div>
+                        <div class="text-sm font-medium mb-2">视频标题</div>
+                        <div class="text-xs text-gray-600 mb-2">我的公司 • 1小时前</div>
+                        <div class="text-xs" x-text="getAdaptedContent('youtube')"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="bg-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">智能适配特性</h2>
+                <p class="text-xl text-gray-600">AI 如何为不同平台优化您的内容</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-text-width text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">长度适配</h3>
+                    <p class="text-gray-600">根据平台字符限制自动调整内容长度</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-hashtag text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">标签优化</h3>
+                    <p class="text-gray-600">为每个平台推荐最适合的标签和关键词</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-palette text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">风格调整</h3>
+                    <p class="text-gray-600">根据平台文化调整语调和表达方式</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-image text-orange-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">格式优化</h3>
+                    <p class="text-gray-600">适配不同平台的内容格式和布局要求</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function contentAdaptationData() {
+            return {
+                originalContent: '我们很高兴地宣布，经过团队数月的努力，我们的新产品功能正式上线了！这个功能将大大提升用户体验，让大家的工作更加高效便捷。我们相信这个创新将为行业带来积极的变化。',
+                contentType: 'announcement',
+                targetAudience: 'general',
+                adapting: false,
+                adaptedContent: [],
+                
+                adaptContent() {
+                    this.adapting = true;
+                    
+                    setTimeout(() => {
+                        this.adaptedContent = this.generateAdaptedContent();
+                        this.adapting = false;
+                    }, 2000);
+                },
+                
+                generateAdaptedContent() {
+                    const base = this.originalContent;
+                    
+                    return {
+                        twitter: "🚀 新功能正式上线！经过团队数月努力，我们为大家带来了更高效便捷的体验。这个创新将为行业带来积极变化！ #产品更新 #创新 #用户体验",
+                        facebook: "🎉 激动人心的消息！\n\n经过我们团队数月的辛勤努力，新产品功能终于正式上线了！这个功能的推出将大大提升用户体验，让大家的工作变得更加高效和便捷。\n\n我们深信这个创新不仅能够帮助用户解决实际问题，更将为整个行业带来积极的变化和发展。\n\n感谢大家一直以来的支持和信任！🙏",
+                        instagram: " 🚀✨ 新功能上线啦！经过团队的不懈努力，我们为大家带来了全新体验 💪 #新功能 #创新 #团队努力 #用户体验 #行业变化",
+                        linkedin: "很荣幸与大家分享一个重要里程碑：\n\n经过我们团队数月的专业研发和精心打磨，我们的新产品功能今日正式发布。这一功能的推出标志着我们在提升用户体验和工作效率方面迈出了重要一步。\n\n我们相信，通过持续的技术创新和产品优化，能够为行业发展贡献更多价值，推动整个生态系统的进步。\n\n期待与各位同行继续交流合作，共同推进行业发展。",
+                        tiktok: "🔥 重磅消息！新功能来了！\n团队超努力 💪\n体验超棒的 ✨\n快来试试吧！\n#新功能 #超棒体验",
+                        youtube: "【重要更新】新功能正式发布！\n\n在这个视频中，我们将详细介绍：\n• 新功能的核心特性\n• 如何提升工作效率\n• 对行业的积极影响\n• 未来发展规划\n\n感谢团队的辛勤努力和用户的持续支持！\n\n🔔 记得订阅我们的频道获取最新更新\n👍 如果觉得有用请点赞\n💬 欢迎在评论区分享您的想法\n\n#产品更新 #新功能 #用户体验 #创新技术"
+                    };
+                },
+                
+                getAdaptedContent(platform) {
+                    return this.adaptedContent[platform] || '';
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</body>
+</html>

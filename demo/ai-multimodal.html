@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Publisher - 多模态 AI 内容生成</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50" x-data="multimodalAI()">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="start.html" class="flex items-center">
+                        <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">AI</span>
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-gray-900">Publisher</span>
+                    </a>
+                </div>
+                <div class="flex items-center">
+                    <a href="start.html" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-arrow-left mr-2"></i>返回首页
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <i class="fas fa-magic text-blue-600 text-2xl"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-4">多模态 AI 内容生成</h1>
+            <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                基于 Google Gemini API 的文本、图片、视频生成功能
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <!-- API Key Setup -->
+        <div x-show="showApiKeyInput" class="bg-white rounded-xl shadow-lg p-8 mb-8 border-l-4 border-blue-500">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-key text-blue-600 text-xl mr-3"></i>
+                <h2 class="text-xl font-bold text-gray-900">设置 Gemini API Key</h2>
+            </div>
+            <p class="text-gray-600 mb-6">
+                为了使用 AI 内容生成功能，您需要提供 Google Gemini API Key。
+                <a href="https://makersuite.google.com/app/apikey" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                    点击这里获取免费 API Key
+                </a>
+            </p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">API Key</label>
+                    <div class="flex space-x-3">
+                        <input 
+                            type="password" 
+                            x-model="apiKey"
+                            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="输入您的 Gemini API Key (以 AIza 开头)..."
+                        >
+                        <button 
+                            @click="saveApiKey()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition duration-200"
+                        >
+                            保存
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error/Success Messages -->
+        <div x-show="errorMessage" class="mb-4 p-4 border rounded-lg bg-red-50 border-red-200 text-red-800">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <span x-text="errorMessage"></span>
+            </div>
+        </div>
+        
+        <div x-show="successMessage" class="mb-4 p-4 border rounded-lg bg-green-50 border-green-200 text-green-800">
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span x-text="successMessage"></span>
+            </div>
+        </div>
+
+        <!-- Content Type Selector -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">选择生成类型</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Text Generation -->
+                <div 
+                    @click="setGenerationType('text')"
+                    :class="generationType === 'text' ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:bg-gray-50'"
+                    class="border border-gray-200 rounded-lg p-6 cursor-pointer transition-all duration-200"
+                >
+                    <div class="text-center">
+                        <i class="fas fa-file-text text-3xl text-blue-600 mb-4"></i>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">文本生成</h3>
+                        <p class="text-sm text-gray-600">生成各种类型的文本内容</p>
+                    </div>
+                </div>
+
+                <!-- Image Generation -->
+                <div 
+                    @click="setGenerationType('image')"
+                    :class="generationType === 'image' ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:bg-gray-50'"
+                    class="border border-gray-200 rounded-lg p-6 cursor-pointer transition-all duration-200"
+                >
+                    <div class="text-center">
+                        <i class="fas fa-image text-3xl text-green-600 mb-4"></i>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">图片生成</h3>
+                        <p class="text-sm text-gray-600">基于文本描述生成图片</p>
+                    </div>
+                </div>
+
+                <!-- Video Generation -->
+                <div 
+                    @click="setGenerationType('video')"
+                    :class="generationType === 'video' ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:bg-gray-50'"
+                    class="border border-gray-200 rounded-lg p-6 cursor-pointer transition-all duration-200"
+                >
+                    <div class="text-center">
+                        <i class="fas fa-video text-3xl text-purple-600 mb-4"></i>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">视频生成</h3>
+                        <p class="text-sm text-gray-600">生成短视频内容</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generation Interface -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <!-- Text Generation -->
+            <div x-show="generationType === 'text'">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">文本内容生成</h3>
+                
+                <div class="space-y-6">
+                    <!-- Prompt Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">内容主题</label>
+                        <textarea 
+                            x-model="textPrompt"
+                            rows="3"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="例如：介绍我们公司的新产品功能，包括AI智能推荐、实时数据分析等特性..."
+                        ></textarea>
+                    </div>
+
+                    <!-- Parameters -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">内容类型</label>
+                            <select x-model="contentType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="social_post">社交媒体</option>
+                                <option value="blog_article">博客文章</option>
+                                <option value="marketing_copy">营销文案</option>
+                                <option value="product_description">产品描述</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">语调风格</label>
+                            <select x-model="tone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="professional">专业</option>
+                                <option value="casual">随意</option>
+                                <option value="friendly">友好</option>
+                                <option value="humorous">幽默</option>
+                                <option value="inspiring">鼓舞</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">内容长度</label>
+                            <select x-model="length" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="short">简短</option>
+                                <option value="medium">中等</option>
+                                <option value="long">详细</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">语言</label>
+                            <select x-model="language" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="zh-CN">中文</option>
+                                <option value="en-US">English</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <div class="text-center">
+                        <button 
+                            @click="generateText()"
+                            :disabled="generating || !textPrompt.trim()"
+                            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-lg font-medium transition duration-200"
+                        >
+                            <span x-show="!generating">
+                                <i class="fas fa-magic mr-2"></i>生成文本内容
+                            </span>
+                            <span x-show="generating">
+                                <i class="fas fa-spinner fa-spin mr-2"></i>AI 正在创作中...
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image Generation -->
+            <div x-show="generationType === 'image'">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">图片内容生成</h3>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">图片描述</label>
+                        <textarea 
+                            x-model="imagePrompt"
+                            rows="3"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="例如：一个现代化的办公室，员工们在使用智能手表，阳光透过落地窗洒进来，科技感十足..."
+                        ></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">图片风格</label>
+                            <select x-model="imageStyle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="realistic">写实风格</option>
+                                <option value="cartoon">卡通风格</option>
+                                <option value="artistic">艺术风格</option>
+                                <option value="minimalist">简约风格</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">图片尺寸</label>
+                            <select x-model="imageSize" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="1024x1024">正方形 (1024x1024)</option>
+                                <option value="1024x768">横向 (1024x768)</option>
+                                <option value="768x1024">纵向 (768x1024)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">图片数量</label>
+                            <select x-model="imageCount" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="1">1张</option>
+                                <option value="2">2张</option>
+                                <option value="4">4张</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button 
+                            @click="generateImage()"
+                            :disabled="generating || !imagePrompt.trim()"
+                            class="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-lg font-medium transition duration-200"
+                        >
+                            <span x-show="!generating">
+                                <i class="fas fa-image mr-2"></i>生成图片
+                            </span>
+                            <span x-show="generating">
+                                <i class="fas fa-spinner fa-spin mr-2"></i>AI 正在绘制中...
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Generation -->
+            <div x-show="generationType === 'video'">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">视频内容生成</h3>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">视频描述</label>
+                        <textarea 
+                            x-model="videoPrompt"
+                            rows="3"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="例如：展示智能手表的各种功能，从健康监测到消息提醒，配合动感的音乐..."
+                        ></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">视频时长</label>
+                            <select x-model="videoDuration" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="5">5秒</option>
+                                <option value="10">10秒</option>
+                                <option value="15">15秒</option>
+                                <option value="30">30秒</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">视频风格</label>
+                            <select x-model="videoStyle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="commercial">商业广告</option>
+                                <option value="documentary">纪录片</option>
+                                <option value="animation">动画</option>
+                                <option value="lifestyle">生活方式</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">视频质量</label>
+                            <select x-model="videoQuality" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="720p">720p</option>
+                                <option value="1080p">1080p</option>
+                                <option value="4k">4K</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button 
+                            @click="generateVideo()"
+                            :disabled="generating || !videoPrompt.trim()"
+                            class="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-lg font-medium transition duration-200"
+                        >
+                            <span x-show="!generating">
+                                <i class="fas fa-video mr-2"></i>生成视频
+                            </span>
+                            <span x-show="generating">
+                                <i class="fas fa-spinner fa-spin mr-2"></i>AI 正在制作中...
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generated Content Display -->
+            <div x-show="generatedContent" class="mt-8 border-t pt-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">生成结果</h3>
+                    <div class="text-sm text-gray-500">
+                        <span x-show="generationType === 'text'" x-text="`字数: ${generatedContent.length}`"></span>
+                        <span x-show="generationType === 'image'">图片已生成</span>
+                        <span x-show="generationType === 'video'">视频已生成</span>
+                    </div>
+                </div>
+                
+                <!-- Text Content -->
+                <div x-show="generationType === 'text'" class="bg-gray-50 rounded-lg p-6 mb-4">
+                    <div class="whitespace-pre-wrap text-gray-800" x-text="generatedContent"></div>
+                </div>
+
+                <!-- Image Content -->
+                <div x-show="generationType === 'image'" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <template x-for="(image, index) in generatedImages" :key="index">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <img :src="image.url" :alt="`生成的图片 ${index + 1}`" class="w-full h-auto rounded-lg">
+                            <div class="mt-2 text-sm text-gray-600" x-text="`图片 ${index + 1}`"></div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Video Content -->
+                <div x-show="generationType === 'video'" class="bg-gray-50 rounded-lg p-6 mb-4">
+                    <video x-show="generatedVideoUrl" :src="generatedVideoUrl" controls class="w-full h-auto rounded-lg">
+                        您的浏览器不支持视频播放。
+                    </video>
+                    <div class="mt-2 text-sm text-gray-600">生成的视频内容</div>
+                </div>
+                
+                <div class="flex flex-wrap gap-3">
+                    <button 
+                        @click="copyContent()" 
+                        x-show="generationType === 'text'"
+                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition duration-200"
+                    >
+                        <i class="fas fa-copy mr-2"></i>复制内容
+                    </button>
+                    <button 
+                        @click="downloadContent()" 
+                        x-show="generationType !== 'text'"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition duration-200"
+                    >
+                        <i class="fas fa-download mr-2"></i>下载文件
+                    </button>
+                    <button 
+                        @click="regenerateContent()" 
+                        :disabled="generating"
+                        class="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm transition duration-200"
+                    >
+                        <i class="fas fa-refresh mr-2"></i>重新生成
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function multimodalAI() {
+            return {
+                // API Configuration
+                apiKey: '',
+                showApiKeyInput: true,
+                
+                // Generation Type
+                generationType: 'text', // text, image, video
+                
+                // Text Generation
+                textPrompt: '我们公司推出了一款革命性的智能手表，具有健康监测、AI助手和长续航功能',
+                contentType: 'social_post',
+                tone: 'friendly',
+                length: 'medium',
+                language: 'zh-CN',
+                
+                // Image Generation
+                imagePrompt: '一个现代化的办公室，员工们在使用智能手表，阳光透过落地窗洒进来，科技感十足',
+                imageStyle: 'realistic',
+                imageSize: '1024x1024',
+                imageCount: '1',
+                
+                // Video Generation
+                videoPrompt: '展示智能手表的各种功能，从健康监测到消息提醒，配合动感的音乐',
+                videoDuration: '10',
+                videoStyle: 'commercial',
+                videoQuality: '1080p',
+                
+                // Generation State
+                generating: false,
+                generatedContent: '',
+                generatedImages: [],
+                generatedVideoUrl: '',
+                
+                // UI State
+                errorMessage: '',
+                successMessage: '',
+                
+                init() {
+                    // 检查本地存储的 API Key
+                    const savedApiKey = localStorage.getItem('gemini_api_key');
+                    if (savedApiKey) {
+                        this.apiKey = savedApiKey;
+                        this.showApiKeyInput = false;
+                    }
+                },
+                
+                setGenerationType(type) {
+                    this.generationType = type;
+                    this.generatedContent = '';
+                    this.generatedImages = [];
+                    this.generatedVideoUrl = '';
+                    this.errorMessage = '';
+                    this.successMessage = '';
+                },
+                
+                saveApiKey() {
+                    if (!this.apiKey.trim()) {
+                        this.showError('请输入有效的 API Key');
+                        return;
+                    }
+
+                    if (!this.apiKey.startsWith('AIza')) {
+                        this.showError('API Key 格式不正确，应该以 "AIza" 开头');
+                        return;
+                    }
+
+                    localStorage.setItem('gemini_api_key', this.apiKey);
+                    this.showApiKeyInput = false;
+                    this.showSuccess('API Key 已保存');
+                },
+
+                async generateText() {
+                    if (!this.textPrompt.trim()) {
+                        this.showError('请输入内容主题');
+                        return;
+                    }
+
+                    if (!this.apiKey.trim()) {
+                        this.showError('请先设置 Gemini API Key');
+                        this.showApiKeyInput = true;
+                        return;
+                    }
+
+                    this.generating = true;
+                    this.errorMessage = '';
+                    this.generatedContent = '';
+
+                    try {
+                        const prompt = this.buildTextPrompt();
+                        const content = await this.callGeminiAPI(prompt);
+                        this.generatedContent = content;
+                        this.showSuccess('文本内容生成成功！');
+                    } catch (error) {
+                        console.error('文本生成失败:', error);
+                        this.showError('生成失败: ' + error.message);
+                    } finally {
+                        this.generating = false;
+                    }
+                },
+
+                async generateImage() {
+                    if (!this.imagePrompt.trim()) {
+                        this.showError('请输入图片描述');
+                        return;
+                    }
+
+                    if (!this.apiKey.trim()) {
+                        this.showError('请先设置 Gemini API Key');
+                        this.showApiKeyInput = true;
+                        return;
+                    }
+
+                    this.generating = true;
+                    this.errorMessage = '';
+                    this.generatedImages = [];
+
+                    try {
+                        // 注意：Gemini API 目前不直接支持图片生成
+                        // 这里我们使用文本生成来创建图片描述，然后提示用户使用其他工具
+                        const prompt = `请为以下图片描述生成详细的创作指导，包括构图、色彩、风格等建议：
+
+图片描述：${this.imagePrompt}
+风格要求：${this.imageStyle}
+尺寸：${this.imageSize}
+
+请提供：
+1. 详细的构图建议
+2. 色彩搭配方案
+3. 风格特点描述
+4. 技术实现建议
+
+格式：专业的图片创作指导`;
+
+                        const content = await this.callGeminiAPI(prompt);
+                        this.generatedContent = content;
+                        this.showSuccess('图片创作指导生成成功！请使用专业图片生成工具（如 DALL-E、Midjourney）根据指导创作图片。');
+                    } catch (error) {
+                        console.error('图片生成失败:', error);
+                        this.showError('生成失败: ' + error.message);
+                    } finally {
+                        this.generating = false;
+                    }
+                },
+
+                async generateVideo() {
+                    if (!this.videoPrompt.trim()) {
+                        this.showError('请输入视频描述');
+                        return;
+                    }
+
+                    if (!this.apiKey.trim()) {
+                        this.showError('请先设置 Gemini API Key');
+                        this.showApiKeyInput = true;
+                        return;
+                    }
+
+                    this.generating = true;
+                    this.errorMessage = '';
+                    this.generatedVideoUrl = '';
+
+                    try {
+                        // 注意：Gemini API 目前不直接支持视频生成
+                        // 这里我们生成详细的视频制作脚本
+                        const prompt = `请为以下视频描述创建详细的制作脚本：
+
+视频描述：${this.videoPrompt}
+时长：${this.videoDuration}秒
+风格：${this.videoStyle}
+质量：${this.videoQuality}
+
+请提供：
+1. 分镜头脚本（每个镜头的时长、内容、角度）
+2. 文案和旁白
+3. 音效和背景音乐建议
+4. 视觉效果描述
+5. 后期制作要点
+
+格式：专业的视频制作脚本`;
+
+                        const content = await this.callGeminiAPI(prompt);
+                        this.generatedContent = content;
+                        this.showSuccess('视频制作脚本生成成功！请使用专业视频制作工具根据脚本制作视频。');
+                    } catch (error) {
+                        console.error('视频生成失败:', error);
+                        this.showError('生成失败: ' + error.message);
+                    } finally {
+                        this.generating = false;
+                    }
+                },
+
+                async callGeminiAPI(prompt) {
+                    const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+
+                    console.log('发送请求到 Gemini API...', { prompt: prompt.substring(0, 100) + '...' });
+
+                    const requestBody = {
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 2048,
+                            stopSequences: []
+                        },
+                        safetySettings: [
+                            {
+                                category: "HARM_CATEGORY_HARASSMENT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_HATE_SPEECH",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            }
+                        ]
+                    };
+
+                    const response = await fetch(`${apiUrl}?key=${this.apiKey}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    console.log('API 响应状态:', response.status, response.statusText);
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('API 错误响应:', errorData);
+
+                        let errorMessage = 'API 请求失败';
+                        if (errorData.error) {
+                            if (errorData.error.message) {
+                                errorMessage = errorData.error.message;
+                            } else if (errorData.error.details) {
+                                errorMessage = errorData.error.details[0]?.reason || errorMessage;
+                            }
+                        }
+
+                        throw new Error(errorMessage);
+                    }
+
+                    const data = await response.json();
+                    console.log('API 成功响应:', data);
+
+                    if (!data.candidates || data.candidates.length === 0) {
+                        throw new Error('API 没有返回候选结果');
+                    }
+
+                    const candidate = data.candidates[0];
+
+                    if (candidate.finishReason === 'SAFETY') {
+                        throw new Error('内容被安全过滤器阻止，请尝试修改提示词');
+                    }
+
+                    if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+                        throw new Error('API 返回了无效的响应格式');
+                    }
+
+                    return candidate.content.parts[0].text;
+                },
+
+                buildTextPrompt() {
+                    const contentTypeMap = {
+                        social_post: '社交媒体帖子',
+                        blog_article: '博客文章',
+                        marketing_copy: '营销文案',
+                        product_description: '产品描述'
+                    };
+
+                    const toneMap = {
+                        professional: '专业',
+                        casual: '随意',
+                        friendly: '友好',
+                        humorous: '幽默',
+                        inspiring: '鼓舞人心'
+                    };
+
+                    const lengthMap = {
+                        short: '简短（50-100字）',
+                        medium: '中等（100-300字）',
+                        long: '详细（300-500字）'
+                    };
+
+                    return `请为我创作一个${contentTypeMap[this.contentType]}，主题是：${this.textPrompt}
+
+要求：
+- 语调风格：${toneMap[this.tone]}
+- 内容长度：${lengthMap[this.length]}
+- 语言：${this.language === 'zh-CN' ? '中文' : '英文'}
+
+请确保内容：
+1. 符合指定的内容类型特点
+2. 具有吸引力和互动性
+3. 包含适当的表情符号和标签（如果适用）
+4. 语言自然流畅，符合指定的语调风格
+
+请直接返回生成的内容，不需要额外的解释。`;
+                },
+
+                copyContent() {
+                    if (!this.generatedContent) {
+                        this.showError('没有内容可复制');
+                        return;
+                    }
+
+                    navigator.clipboard.writeText(this.generatedContent).then(() => {
+                        this.showSuccess('内容已复制到剪贴板！');
+                    }).catch(() => {
+                        this.showError('复制失败，请手动复制');
+                    });
+                },
+
+                downloadContent() {
+                    if (this.generationType === 'image' && this.generatedImages.length > 0) {
+                        // 下载图片
+                        this.generatedImages.forEach((image, index) => {
+                            const link = document.createElement('a');
+                            link.href = image.url;
+                            link.download = `generated-image-${index + 1}.png`;
+                            link.click();
+                        });
+                        this.showSuccess('图片下载已开始');
+                    } else if (this.generationType === 'video' && this.generatedVideoUrl) {
+                        // 下载视频
+                        const link = document.createElement('a');
+                        link.href = this.generatedVideoUrl;
+                        link.download = 'generated-video.mp4';
+                        link.click();
+                        this.showSuccess('视频下载已开始');
+                    } else {
+                        this.showError('没有可下载的文件');
+                    }
+                },
+
+                async regenerateContent() {
+                    switch (this.generationType) {
+                        case 'text':
+                            await this.generateText();
+                            break;
+                        case 'image':
+                            await this.generateImage();
+                            break;
+                        case 'video':
+                            await this.generateVideo();
+                            break;
+                    }
+                },
+
+                showError(message) {
+                    this.errorMessage = message;
+                    this.successMessage = '';
+                    setTimeout(() => {
+                        this.errorMessage = '';
+                    }, 5000);
+                },
+
+                showSuccess(message) {
+                    this.successMessage = message;
+                    this.errorMessage = '';
+                    setTimeout(() => {
+                        this.successMessage = '';
+                    }, 3000);
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</body>
+</html>

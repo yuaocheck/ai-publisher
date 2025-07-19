@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Publisher - 创建内容</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50" x-data="createPostData()">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">AI</span>
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-gray-900">Publisher</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button @click="saveDraft()" class="text-gray-600 hover:text-gray-800 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-save mr-2"></i>保存草稿
+                    </button>
+                    <button @click="showPreview = true" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-eye mr-2"></i>预览
+                    </button>
+                    <button @click="publishPost()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-paper-plane mr-2"></i>发布
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Content Editor -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Title -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">内容标题</label>
+                    <input 
+                        type="text" 
+                        x-model="post.title"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="为您的内容添加一个吸引人的标题..."
+                    >
+                </div>
+
+                <!-- Content -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <label class="block text-sm font-medium text-gray-700">内容正文</label>
+                        <button @click="generateWithAI()" class="bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1 rounded text-sm">
+                            <i class="fas fa-magic mr-1"></i>AI 生成
+                        </button>
+                    </div>
+                    <textarea 
+                        x-model="post.content"
+                        rows="8" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="在这里输入您的内容..."
+                    ></textarea>
+                    <div class="mt-2 flex justify-between text-sm text-gray-500">
+                        <span>支持 Markdown 格式</span>
+                        <span x-text="post.content.length + ' 字符'"></span>
+                    </div>
+                </div>
+
+                <!-- Media Upload -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-4">媒体文件</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                        <div class="space-y-2">
+                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400"></i>
+                            <div>
+                                <button class="text-blue-600 hover:text-blue-500 font-medium">点击上传</button>
+                                <span class="text-gray-500">或拖拽文件到此处</span>
+                            </div>
+                            <p class="text-xs text-gray-500">支持 JPG, PNG, GIF, MP4 格式，最大 50MB</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Uploaded Files -->
+                    <div x-show="uploadedFiles.length > 0" class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <template x-for="(file, index) in uploadedFiles" :key="index">
+                            <div class="relative">
+                                <img :src="file.preview" :alt="file.name" class="w-full h-24 object-cover rounded-lg">
+                                <button @click="removeFile(index)" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Hashtags -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">标签</label>
+                    <input 
+                        type="text" 
+                        x-model="hashtagInput"
+                        @keydown.enter.prevent="addHashtag()"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="输入标签并按回车添加..."
+                    >
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <template x-for="(tag, index) in post.hashtags" :key="index">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                #<span x-text="tag"></span>
+                                <button @click="removeHashtag(index)" class="ml-1 text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-times text-xs"></i>
+                                </button>
+                            </span>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Platform Selection -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">发布平台</h3>
+                    <div class="space-y-3">
+                        <template x-for="platform in platforms" :key="platform.id">
+                            <label class="flex items-center">
+                                <input 
+                                    type="checkbox" 
+                                    :value="platform.id"
+                                    x-model="selectedPlatforms"
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                >
+                                <div class="ml-3 flex items-center space-x-2">
+                                    <i :class="platform.icon" class="text-lg" :style="'color: ' + platform.color"></i>
+                                    <span class="text-sm font-medium text-gray-700" x-text="platform.name"></span>
+                                </div>
+                            </label>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Publishing Options -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">发布选项</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="flex items-center">
+                                <input 
+                                    type="radio" 
+                                    value="now" 
+                                    x-model="publishOption"
+                                    class="text-blue-600 focus:ring-blue-500"
+                                >
+                                <span class="ml-2 text-sm text-gray-700">立即发布</span>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="flex items-center">
+                                <input 
+                                    type="radio" 
+                                    value="schedule" 
+                                    x-model="publishOption"
+                                    class="text-blue-600 focus:ring-blue-500"
+                                >
+                                <span class="ml-2 text-sm text-gray-700">定时发布</span>
+                            </label>
+                        </div>
+                        <div x-show="publishOption === 'schedule'" class="ml-6 space-y-2">
+                            <input 
+                                type="datetime-local" 
+                                x-model="scheduleTime"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                            >
+                        </div>
+                        <div>
+                            <label class="flex items-center">
+                                <input 
+                                    type="radio" 
+                                    value="draft" 
+                                    x-model="publishOption"
+                                    class="text-blue-600 focus:ring-blue-500"
+                                >
+                                <span class="ml-2 text-sm text-gray-700">保存为草稿</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Templates -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">内容模板</h3>
+                    <div class="space-y-2">
+                        <template x-for="template in templates" :key="template.id">
+                            <button 
+                                @click="applyTemplate(template)"
+                                class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                            >
+                                <div class="font-medium" x-text="template.name"></div>
+                                <div class="text-xs text-gray-500" x-text="template.description"></div>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- AI Suggestions -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">AI 建议</h3>
+                    <div class="space-y-3">
+                        <button class="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 p-3 rounded-lg text-left text-sm">
+                            <i class="fas fa-lightbulb mr-2"></i>
+                            优化内容吸引力
+                        </button>
+                        <button class="w-full bg-green-50 hover:bg-green-100 text-green-700 p-3 rounded-lg text-left text-sm">
+                            <i class="fas fa-hashtag mr-2"></i>
+                            推荐热门标签
+                        </button>
+                        <button class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 p-3 rounded-lg text-left text-sm">
+                            <i class="fas fa-clock mr-2"></i>
+                            最佳发布时间
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div x-show="showPreview" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-screen overflow-y-auto">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-900">内容预览</h2>
+                <button @click="showPreview = false" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Twitter Preview -->
+                    <div x-show="selectedPlatforms.includes('twitter')" class="border rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <i class="fab fa-twitter text-blue-500"></i>
+                            <span class="font-medium text-sm">Twitter 预览</span>
+                        </div>
+                        <div class="bg-white border rounded-lg p-4">
+                            <div class="flex items-start space-x-3">
+                                <img src="https://via.placeholder.com/40x40" alt="Avatar" class="w-10 h-10 rounded-full">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-bold text-sm">我的公司</span>
+                                        <span class="text-gray-500 text-sm">@mycompany</span>
+                                        <span class="text-gray-500 text-sm">·</span>
+                                        <span class="text-gray-500 text-sm">现在</span>
+                                    </div>
+                                    <div class="mt-1 text-sm" x-text="post.content.substring(0, 280)"></div>
+                                    <div class="mt-3 flex items-center space-x-6 text-gray-500">
+                                        <div class="flex items-center space-x-1">
+                                            <i class="far fa-comment"></i>
+                                            <span class="text-xs">12</span>
+                                        </div>
+                                        <div class="flex items-center space-x-1">
+                                            <i class="fas fa-retweet"></i>
+                                            <span class="text-xs">5</span>
+                                        </div>
+                                        <div class="flex items-center space-x-1">
+                                            <i class="far fa-heart"></i>
+                                            <span class="text-xs">23</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Facebook Preview -->
+                    <div x-show="selectedPlatforms.includes('facebook')" class="border rounded-lg p-4">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <i class="fab fa-facebook text-blue-600"></i>
+                            <span class="font-medium text-sm">Facebook 预览</span>
+                        </div>
+                        <div class="bg-white border rounded-lg p-4">
+                            <div class="flex items-start space-x-3">
+                                <img src="https://via.placeholder.com/40x40" alt="Avatar" class="w-10 h-10 rounded-full">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-bold text-sm">我的公司</span>
+                                        <span class="text-gray-500 text-sm">·</span>
+                                        <span class="text-gray-500 text-sm">刚刚</span>
+                                    </div>
+                                    <div class="mt-2 text-sm" x-text="post.content"></div>
+                                    <div class="mt-3 flex items-center space-x-6 text-gray-500 text-sm">
+                                        <div class="flex items-center space-x-1">
+                                            <i class="far fa-thumbs-up"></i>
+                                            <span>赞</span>
+                                        </div>
+                                        <div class="flex items-center space-x-1">
+                                            <i class="far fa-comment"></i>
+                                            <span>评论</span>
+                                        </div>
+                                        <div class="flex items-center space-x-1">
+                                            <i class="fas fa-share"></i>
+                                            <span>分享</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function createPostData() {
+            return {
+                post: {
+                    title: '',
+                    content: '',
+                    hashtags: []
+                },
+                hashtagInput: '',
+                selectedPlatforms: ['twitter', 'facebook'],
+                publishOption: 'now',
+                scheduleTime: '',
+                showPreview: false,
+                uploadedFiles: [],
+                
+                platforms: [
+                    { id: 'twitter', name: 'Twitter', icon: 'fab fa-twitter', color: '#1DA1F2' },
+                    { id: 'facebook', name: 'Facebook', icon: 'fab fa-facebook', color: '#1877F2' },
+                    { id: 'instagram', name: 'Instagram', icon: 'fab fa-instagram', color: '#E4405F' },
+                    { id: 'linkedin', name: 'LinkedIn', icon: 'fab fa-linkedin', color: '#0A66C2' }
+                ],
+                
+                templates: [
+                    { id: 1, name: '产品发布', description: '新产品发布公告模板' },
+                    { id: 2, name: '活动推广', description: '活动宣传推广模板' },
+                    { id: 3, name: '博客分享', description: '博客文章分享模板' },
+                    { id: 4, name: '团队介绍', description: '团队成员介绍模板' }
+                ],
+                
+                addHashtag() {
+                    if (this.hashtagInput.trim() && !this.post.hashtags.includes(this.hashtagInput.trim())) {
+                        this.post.hashtags.push(this.hashtagInput.trim());
+                        this.hashtagInput = '';
+                    }
+                },
+                
+                removeHashtag(index) {
+                    this.post.hashtags.splice(index, 1);
+                },
+                
+                removeFile(index) {
+                    this.uploadedFiles.splice(index, 1);
+                },
+                
+                applyTemplate(template) {
+                    // 模拟应用模板
+                    if (template.id === 1) {
+                        this.post.content = '🚀 激动地宣布我们的新产品正式发布！\n\n经过团队的不懈努力，我们为大家带来了...\n\n#产品发布 #创新 #科技';
+                    }
+                },
+                
+                generateWithAI() {
+                    // 模拟 AI 生成内容
+                    this.post.content = '🌟 今天想和大家分享一些关于创新的思考...\n\n在这个快速变化的时代，我们需要保持开放的心态，拥抱新技术，同时不忘初心。\n\n你们是如何看待创新的呢？欢迎在评论区分享你的想法！\n\n#创新思维 #科技发展 #未来趋势';
+                },
+                
+                saveDraft() {
+                    alert('草稿已保存！');
+                },
+                
+                publishPost() {
+                    if (this.selectedPlatforms.length === 0) {
+                        alert('请选择至少一个发布平台');
+                        return;
+                    }
+                    if (!this.post.content.trim()) {
+                        alert('请输入内容');
+                        return;
+                    }
+                    
+                    let message = '内容将发布到: ' + this.selectedPlatforms.join(', ');
+                    if (this.publishOption === 'schedule') {
+                        message += '\n发布时间: ' + this.scheduleTime;
+                    }
+                    alert(message);
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</body>
+</html>

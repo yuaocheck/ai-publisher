@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Publisher - 定时发布</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .schedule-card {
+            transition: all 0.3s ease;
+        }
+        .schedule-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .time-slot {
+            transition: all 0.2s ease;
+        }
+        .time-slot:hover {
+            background-color: #f3f4f6;
+        }
+        .time-slot.selected {
+            background-color: #dbeafe;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50" x-data="scheduledPublishingData()">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="start.html" class="flex items-center">
+                        <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">AI</span>
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-gray-900">Publisher</span>
+                    </a>
+                </div>
+                <div class="flex items-center">
+                    <a href="start.html" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-arrow-left mr-2"></i>返回首页
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="gradient-bg py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <i class="fas fa-clock text-orange-600 text-2xl"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-4">定时发布</h1>
+            <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                支持定时发布和循环发布，灵活安排内容计划
+            </p>
+        </div>
+    </div>
+
+    <!-- Schedule Creator -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-12">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">创建发布计划</h2>
+                <p class="text-gray-600">设置内容的发布时间和频率</p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Content Input -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">发布内容</label>
+                    <textarea 
+                        x-model="scheduleContent"
+                        rows="3" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="输入要发布的内容..."
+                    ></textarea>
+                </div>
+
+                <!-- Platform Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">发布平台</label>
+                    <div class="flex flex-wrap gap-3">
+                        <template x-for="platform in platforms" :key="platform.id">
+                            <label class="flex items-center">
+                                <input 
+                                    type="checkbox" 
+                                    :value="platform.id"
+                                    x-model="selectedPlatforms"
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                >
+                                <i :class="platform.icon" class="ml-2 mr-1" :style="'color: ' + platform.color"></i>
+                                <span class="text-sm text-gray-700" x-text="platform.name"></span>
+                            </label>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Schedule Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">发布类型</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <label class="flex items-center p-4 border rounded-lg cursor-pointer" :class="scheduleType === 'once' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'">
+                            <input type="radio" value="once" x-model="scheduleType" class="text-blue-600 focus:ring-blue-500">
+                            <div class="ml-3">
+                                <div class="font-medium text-gray-900">单次发布</div>
+                                <div class="text-sm text-gray-500">指定时间发布一次</div>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center p-4 border rounded-lg cursor-pointer" :class="scheduleType === 'recurring' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'">
+                            <input type="radio" value="recurring" x-model="scheduleType" class="text-blue-600 focus:ring-blue-500">
+                            <div class="ml-3">
+                                <div class="font-medium text-gray-900">循环发布</div>
+                                <div class="text-sm text-gray-500">按设定频率重复发布</div>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center p-4 border rounded-lg cursor-pointer" :class="scheduleType === 'optimal' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'">
+                            <input type="radio" value="optimal" x-model="scheduleType" class="text-blue-600 focus:ring-blue-500">
+                            <div class="ml-3">
+                                <div class="font-medium text-gray-900">最佳时间</div>
+                                <div class="text-sm text-gray-500">AI 推荐最佳发布时间</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Date and Time Selection -->
+                <div x-show="scheduleType === 'once'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">发布日期</label>
+                        <input 
+                            type="date" 
+                            x-model="publishDate"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">发布时间</label>
+                        <input 
+                            type="time" 
+                            x-model="publishTime"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+                </div>
+
+                <!-- Recurring Options -->
+                <div x-show="scheduleType === 'recurring'" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">重复频率</label>
+                            <select x-model="recurringFrequency" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="daily">每天</option>
+                                <option value="weekly">每周</option>
+                                <option value="monthly">每月</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">发布时间</label>
+                            <input 
+                                type="time" 
+                                x-model="recurringTime"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                        </div>
+                    </div>
+                    
+                    <div x-show="recurringFrequency === 'weekly'">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">选择星期</label>
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="day in weekDays" :key="day.value">
+                                <label class="flex items-center">
+                                    <input 
+                                        type="checkbox" 
+                                        :value="day.value"
+                                        x-model="selectedWeekDays"
+                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    >
+                                    <span class="ml-2 text-sm text-gray-700" x-text="day.label"></span>
+                                </label>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Optimal Time Suggestions -->
+                <div x-show="scheduleType === 'optimal'" class="space-y-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h4 class="font-medium text-blue-900 mb-2">AI 推荐的最佳发布时间</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <template x-for="suggestion in optimalTimes" :key="suggestion.platform">
+                                <div class="bg-white p-3 rounded border">
+                                    <div class="flex items-center mb-2">
+                                        <i :class="suggestion.icon" class="mr-2" :style="'color: ' + suggestion.color"></i>
+                                        <span class="font-medium text-sm" x-text="suggestion.platform"></span>
+                                    </div>
+                                    <div class="text-xs text-gray-600">
+                                        <div>最佳时间: <span x-text="suggestion.bestTime"></span></div>
+                                        <div>预估互动: <span x-text="suggestion.engagement"></span></div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex space-x-4 pt-6">
+                    <button 
+                        @click="schedulePost()"
+                        :disabled="!scheduleContent.trim() || selectedPlatforms.length === 0"
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-lg font-medium transition duration-200"
+                    >
+                        <i class="fas fa-calendar-plus mr-2"></i>创建计划
+                    </button>
+                    <button 
+                        @click="previewSchedule()"
+                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-6 rounded-lg font-medium transition duration-200"
+                    >
+                        <i class="fas fa-eye mr-2"></i>预览
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scheduled Posts -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">已计划的发布</h2>
+                <div class="flex space-x-2">
+                    <button @click="viewType = 'list'" :class="viewType === 'list' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'" class="px-4 py-2 rounded-lg text-sm">
+                        <i class="fas fa-list mr-1"></i>列表
+                    </button>
+                    <button @click="viewType = 'calendar'" :class="viewType === 'calendar' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'" class="px-4 py-2 rounded-lg text-sm">
+                        <i class="fas fa-calendar mr-1"></i>日历
+                    </button>
+                </div>
+            </div>
+
+            <!-- List View -->
+            <div x-show="viewType === 'list'" class="space-y-4">
+                <template x-for="post in scheduledPosts" :key="post.id">
+                    <div class="schedule-card border border-gray-200 rounded-lg p-4">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="text-sm font-medium text-gray-900" x-text="post.title"></span>
+                                    <span :class="getStatusClass(post.status)" class="px-2 py-1 rounded-full text-xs font-medium" x-text="post.status"></span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-3" x-text="post.content"></p>
+                                <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar mr-1"></i>
+                                        <span x-text="post.scheduledTime"></span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <template x-for="platform in post.platforms" :key="platform">
+                                            <i :class="getPlatformIcon(platform)" class="text-gray-400"></i>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2 ml-4">
+                                <button @click="editPost(post)" class="text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button @click="deletePost(post.id)" class="text-red-600 hover:text-red-800">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Calendar View -->
+            <div x-show="viewType === 'calendar'" class="bg-gray-50 p-4 rounded-lg">
+                <div class="text-center text-gray-500">
+                    <i class="fas fa-calendar-alt text-4xl mb-4"></i>
+                    <p>日历视图功能开发中...</p>
+                    <p class="text-sm">将显示所有计划发布的内容</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function scheduledPublishingData() {
+            return {
+                scheduleContent: '',
+                selectedPlatforms: ['twitter'],
+                scheduleType: 'once',
+                publishDate: '',
+                publishTime: '09:00',
+                recurringFrequency: 'daily',
+                recurringTime: '09:00',
+                selectedWeekDays: ['monday', 'wednesday', 'friday'],
+                viewType: 'list',
+                
+                platforms: [
+                    { id: 'twitter', name: 'Twitter', icon: 'fab fa-twitter', color: '#1DA1F2' },
+                    { id: 'facebook', name: 'Facebook', icon: 'fab fa-facebook', color: '#1877F2' },
+                    { id: 'instagram', name: 'Instagram', icon: 'fab fa-instagram', color: '#E4405F' },
+                    { id: 'linkedin', name: 'LinkedIn', icon: 'fab fa-linkedin', color: '#0A66C2' }
+                ],
+                
+                weekDays: [
+                    { value: 'monday', label: '周一' },
+                    { value: 'tuesday', label: '周二' },
+                    { value: 'wednesday', label: '周三' },
+                    { value: 'thursday', label: '周四' },
+                    { value: 'friday', label: '周五' },
+                    { value: 'saturday', label: '周六' },
+                    { value: 'sunday', label: '周日' }
+                ],
+                
+                optimalTimes: [
+                    { platform: 'Twitter', icon: 'fab fa-twitter', color: '#1DA1F2', bestTime: '09:00-11:00', engagement: '高' },
+                    { platform: 'Facebook', icon: 'fab fa-facebook', color: '#1877F2', bestTime: '13:00-15:00', engagement: '中' },
+                    { platform: 'Instagram', icon: 'fab fa-instagram', color: '#E4405F', bestTime: '18:00-20:00', engagement: '高' },
+                    { platform: 'LinkedIn', icon: 'fab fa-linkedin', color: '#0A66C2', bestTime: '08:00-10:00', engagement: '中' }
+                ],
+                
+                scheduledPosts: [
+                    {
+                        id: 1,
+                        title: '产品更新公告',
+                        content: '我们很高兴地宣布新功能正式上线！这将大大提升用户体验...',
+                        scheduledTime: '2024-01-15 09:00',
+                        platforms: ['twitter', 'facebook'],
+                        status: '待发布'
+                    },
+                    {
+                        id: 2,
+                        title: '周末问候',
+                        content: '祝大家周末愉快！记得休息好，下周继续加油！',
+                        scheduledTime: '2024-01-13 18:00',
+                        platforms: ['instagram', 'facebook'],
+                        status: '已发布'
+                    },
+                    {
+                        id: 3,
+                        title: '行业洞察分享',
+                        content: '分享一些关于数字化转型的思考和见解...',
+                        scheduledTime: '2024-01-16 10:00',
+                        platforms: ['linkedin'],
+                        status: '待发布'
+                    }
+                ],
+                
+                schedulePost() {
+                    if (!this.scheduleContent.trim() || this.selectedPlatforms.length === 0) return;
+                    
+                    const newPost = {
+                        id: this.scheduledPosts.length + 1,
+                        title: this.scheduleContent.substring(0, 30) + '...',
+                        content: this.scheduleContent,
+                        scheduledTime: this.getScheduledTime(),
+                        platforms: [...this.selectedPlatforms],
+                        status: '待发布'
+                    };
+                    
+                    this.scheduledPosts.unshift(newPost);
+                    this.resetForm();
+                    alert('发布计划创建成功！');
+                },
+                
+                getScheduledTime() {
+                    if (this.scheduleType === 'once') {
+                        return `${this.publishDate} ${this.publishTime}`;
+                    } else if (this.scheduleType === 'recurring') {
+                        return `每${this.getFrequencyText()} ${this.recurringTime}`;
+                    } else {
+                        return 'AI 推荐时间';
+                    }
+                },
+                
+                getFrequencyText() {
+                    const freq = {
+                        daily: '天',
+                        weekly: '周',
+                        monthly: '月'
+                    };
+                    return freq[this.recurringFrequency] || '天';
+                },
+                
+                resetForm() {
+                    this.scheduleContent = '';
+                    this.selectedPlatforms = ['twitter'];
+                    this.scheduleType = 'once';
+                    this.publishDate = '';
+                    this.publishTime = '09:00';
+                },
+                
+                previewSchedule() {
+                    alert('预览功能开发中...');
+                },
+                
+                editPost(post) {
+                    alert(`编辑发布计划: ${post.title}`);
+                },
+                
+                deletePost(id) {
+                    if (confirm('确定要删除这个发布计划吗？')) {
+                        this.scheduledPosts = this.scheduledPosts.filter(post => post.id !== id);
+                    }
+                },
+                
+                getStatusClass(status) {
+                    const classes = {
+                        '待发布': 'bg-yellow-100 text-yellow-800',
+                        '已发布': 'bg-green-100 text-green-800',
+                        '发布失败': 'bg-red-100 text-red-800'
+                    };
+                    return classes[status] || 'bg-gray-100 text-gray-800';
+                },
+                
+                getPlatformIcon(platform) {
+                    const icons = {
+                        twitter: 'fab fa-twitter',
+                        facebook: 'fab fa-facebook',
+                        instagram: 'fab fa-instagram',
+                        linkedin: 'fab fa-linkedin'
+                    };
+                    return icons[platform] || 'fas fa-globe';
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</body>
+</html>

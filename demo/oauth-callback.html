@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>授权回调 - AI Publisher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-md w-full mx-4">
+        <div class="text-center">
+            <div id="loading" class="mb-6">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-spinner fa-spin text-blue-600 text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">正在处理授权...</h2>
+                <p class="text-gray-600">请稍候，正在完成账号连接</p>
+            </div>
+            
+            <div id="success" class="hidden mb-6">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-green-600 text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">授权成功！</h2>
+                <p class="text-gray-600">账号已成功连接，窗口将自动关闭</p>
+            </div>
+            
+            <div id="error" class="hidden mb-6">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-times text-red-600 text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">授权失败</h2>
+                <p class="text-gray-600" id="error-message">授权过程中出现错误，请重试</p>
+            </div>
+            
+            <button 
+                id="close-btn" 
+                onclick="window.close()" 
+                class="hidden bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-200"
+            >
+                关闭窗口
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 处理 OAuth 回调
+        function handleOAuthCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const error = urlParams.get('error');
+            const state = urlParams.get('state');
+            
+            if (error) {
+                showError(getErrorMessage(error));
+                return;
+            }
+            
+            if (!code) {
+                showError('未收到授权码');
+                return;
+            }
+            
+            // 将授权信息传递给父窗口
+            if (window.opener) {
+                try {
+                    // 通过 postMessage 安全地传递数据
+                    window.opener.postMessage({
+                        type: 'oauth_callback',
+                        code: code,
+                        state: state,
+                        success: true
+                    }, window.location.origin);
+                    
+                    showSuccess();
+                    
+                    // 3秒后自动关闭窗口
+                    setTimeout(() => {
+                        window.close();
+                    }, 3000);
+                    
+                } catch (error) {
+                    console.error('传递授权信息失败:', error);
+                    showError('授权信息传递失败');
+                }
+            } else {
+                // 如果没有父窗口，尝试通过 localStorage 传递信息
+                try {
+                    const authData = {
+                        code: code,
+                        state: state,
+                        timestamp: Date.now(),
+                        success: true
+                    };
+                    localStorage.setItem('oauth_callback_data', JSON.stringify(authData));
+                    showSuccess();
+                    
+                    setTimeout(() => {
+                        window.close();
+                    }, 3000);
+                } catch (error) {
+                    console.error('保存授权信息失败:', error);
+                    showError('授权信息保存失败');
+                }
+            }
+        }
+        
+        function showSuccess() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.add('hidden');
+            document.getElementById('success').classList.remove('hidden');
+            document.getElementById('close-btn').classList.remove('hidden');
+        }
+        
+        function showError(message) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('success').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
+            document.getElementById('error-message').textContent = message;
+            document.getElementById('close-btn').classList.remove('hidden');
+        }
+        
+        function getErrorMessage(error) {
+            const errorMessages = {
+                'access_denied': '用户拒绝了授权请求',
+                'invalid_request': '授权请求无效',
+                'unauthorized_client': '客户端未授权',
+                'unsupported_response_type': '不支持的响应类型',
+                'invalid_scope': '请求的权限范围无效',
+                'server_error': '服务器错误',
+                'temporarily_unavailable': '服务暂时不可用'
+            };
+            
+            return errorMessages[error] || `授权错误: ${error}`;
+        }
+        
+        // 页面加载时处理回调
+        document.addEventListener('DOMContentLoaded', handleOAuthCallback);
+        
+        // 监听来自父窗口的消息
+        window.addEventListener('message', function(event) {
+            if (event.origin !== window.location.origin) {
+                return;
+            }
+            
+            if (event.data.type === 'close_oauth_window') {
+                window.close();
+            }
+        });
+        
+        // 如果窗口在 30 秒内没有关闭，显示手动关闭按钮
+        setTimeout(() => {
+            if (!document.getElementById('close-btn').classList.contains('hidden')) {
+                return;
+            }
+            
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
+            document.getElementById('error-message').textContent = '授权超时，请手动关闭窗口';
+            document.getElementById('close-btn').classList.remove('hidden');
+        }, 30000);
+    </script>
+</body>
+</html>

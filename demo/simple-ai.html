@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Publisher - 简化版 AI 内容生成</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50" x-data="aiGenerator()">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="start.html" class="flex items-center">
+                        <div class="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">AI</span>
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-gray-900">Publisher</span>
+                    </a>
+                </div>
+                <div class="flex items-center">
+                    <a href="start.html" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
+                        <i class="fas fa-arrow-left mr-2"></i>返回首页
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <i class="fas fa-robot text-blue-600 text-2xl"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-4">AI 内容生成</h1>
+            <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                使用 Google Gemini AI 智能生成高质量内容
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <!-- API Key Setup -->
+        <div x-show="showApiKeyInput" class="bg-white rounded-xl shadow-lg p-8 mb-8 border-l-4 border-blue-500">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-key text-blue-600 text-xl mr-3"></i>
+                <h2 class="text-xl font-bold text-gray-900">设置 Gemini API Key</h2>
+            </div>
+            <p class="text-gray-600 mb-6">
+                为了使用 AI 内容生成功能，您需要提供 Google Gemini API Key。
+                <a href="https://makersuite.google.com/app/apikey" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                    点击这里获取免费 API Key
+                </a>
+            </p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">API Key</label>
+                    <div class="flex space-x-3">
+                        <input 
+                            type="password" 
+                            x-model="apiKey"
+                            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="输入您的 Gemini API Key (以 AIza 开头)..."
+                        >
+                        <button 
+                            @click="saveApiKey()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition duration-200"
+                        >
+                            保存
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error/Success Messages -->
+        <div x-show="errorMessage" class="mb-4 p-4 border rounded-lg bg-red-50 border-red-200 text-red-800">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <span x-text="errorMessage"></span>
+            </div>
+        </div>
+        
+        <div x-show="successMessage" class="mb-4 p-4 border rounded-lg bg-green-50 border-green-200 text-green-800">
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span x-text="successMessage"></span>
+            </div>
+        </div>
+
+        <!-- AI Generator -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <div class="flex justify-between items-center mb-8">
+                <div class="text-center flex-1">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">AI 内容生成器</h2>
+                    <p class="text-gray-600">输入您的想法，AI 为您创作精彩内容</p>
+                </div>
+                <div x-show="!showApiKeyInput">
+                    <button 
+                        @click="showApiKeyInput = true"
+                        class="text-gray-500 hover:text-gray-700 text-sm"
+                        title="更换 API Key"
+                    >
+                        <i class="fas fa-cog mr-1"></i>设置
+                    </button>
+                </div>
+            </div>
+
+            <!-- Input Form -->
+            <div class="space-y-6">
+                <!-- Content Topic -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-sm font-medium text-gray-700">内容主题</label>
+                        <span class="text-xs text-gray-500" x-text="prompt.length + ' 字符'"></span>
+                    </div>
+                    <textarea 
+                        x-model="prompt"
+                        rows="3"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="例如：介绍我们的新产品功能，包括AI智能推荐、实时数据分析等特性..."
+                    ></textarea>
+                </div>
+
+                <!-- Parameters -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">内容类型</label>
+                        <select x-model="contentType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="social_post">社交媒体</option>
+                            <option value="blog_article">博客文章</option>
+                            <option value="marketing_copy">营销文案</option>
+                            <option value="product_description">产品描述</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">语调风格</label>
+                        <select x-model="tone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="professional">专业</option>
+                            <option value="casual">随意</option>
+                            <option value="friendly">友好</option>
+                            <option value="humorous">幽默</option>
+                            <option value="inspiring">鼓舞</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">内容长度</label>
+                        <select x-model="length" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="short">简短</option>
+                            <option value="medium">中等</option>
+                            <option value="long">详细</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">语言</label>
+                        <select x-model="language" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="zh-CN">中文</option>
+                            <option value="en-US">English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Target Platforms -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">目标平台</label>
+                    <div class="flex flex-wrap gap-3">
+                        <template x-for="platform in platforms" :key="platform.id">
+                            <label class="flex items-center">
+                                <input 
+                                    type="checkbox" 
+                                    :value="platform.id"
+                                    x-model="selectedPlatforms"
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                >
+                                <span class="ml-2 text-sm text-gray-700" x-text="platform.name"></span>
+                            </label>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <div class="text-center">
+                    <button 
+                        @click="generateContent()"
+                        :disabled="generating || !prompt.trim()"
+                        class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-lg font-medium transition duration-200"
+                    >
+                        <span x-show="!generating">
+                            <i class="fas fa-magic mr-2"></i>生成内容
+                        </span>
+                        <span x-show="generating">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>AI 正在创作中...
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Generated Content -->
+            <div x-show="generatedContent" class="mt-8 border-t pt-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">生成的内容</h3>
+                    <div class="text-sm text-gray-500">
+                        字数: <span x-text="generatedContent.length"></span>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-6 mb-4">
+                    <div class="whitespace-pre-wrap text-gray-800" x-text="generatedContent"></div>
+                </div>
+                
+                <div class="flex flex-wrap gap-3">
+                    <button 
+                        @click="copyContent()" 
+                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition duration-200"
+                    >
+                        <i class="fas fa-copy mr-2"></i>复制内容
+                    </button>
+                    <button 
+                        @click="optimizeContent()" 
+                        :disabled="generating"
+                        class="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm transition duration-200"
+                    >
+                        <i class="fas fa-wand-magic-sparkles mr-2"></i>
+                        <span x-show="!generating">优化内容</span>
+                        <span x-show="generating">优化中...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function aiGenerator() {
+            return {
+                // API Configuration
+                apiKey: '',
+                showApiKeyInput: true,
+                
+                // Form Data
+                prompt: '我们公司推出了一款革命性的智能手表，具有健康监测、AI助手和长续航功能',
+                contentType: 'social_post',
+                tone: 'friendly',
+                length: 'medium',
+                selectedPlatforms: ['twitter', 'facebook'],
+                language: 'zh-CN',
+                
+                // Generation State
+                generating: false,
+                generatedContent: '',
+                
+                // UI State
+                errorMessage: '',
+                successMessage: '',
+                
+                platforms: [
+                    { id: 'twitter', name: 'Twitter' },
+                    { id: 'facebook', name: 'Facebook' },
+                    { id: 'instagram', name: 'Instagram' },
+                    { id: 'linkedin', name: 'LinkedIn' },
+                    { id: 'tiktok', name: 'TikTok' },
+                    { id: 'youtube', name: 'YouTube' }
+                ],
+                
+                init() {
+                    // 检查本地存储的 API Key
+                    const savedApiKey = localStorage.getItem('gemini_api_key');
+                    if (savedApiKey) {
+                        this.apiKey = savedApiKey;
+                        this.showApiKeyInput = false;
+                    }
+                },
+                
+                saveApiKey() {
+                    if (!this.apiKey.trim()) {
+                        this.showError('请输入有效的 API Key');
+                        return;
+                    }
+                    
+                    if (!this.apiKey.startsWith('AIza')) {
+                        this.showError('API Key 格式不正确，应该以 "AIza" 开头');
+                        return;
+                    }
+                    
+                    localStorage.setItem('gemini_api_key', this.apiKey);
+                    this.showApiKeyInput = false;
+                    this.showSuccess('API Key 已保存');
+                },
+                
+                async generateContent() {
+                    if (!this.prompt.trim()) {
+                        this.showError('请输入内容主题');
+                        return;
+                    }
+                    
+                    if (!this.apiKey.trim()) {
+                        this.showError('请先设置 Gemini API Key');
+                        this.showApiKeyInput = true;
+                        return;
+                    }
+                    
+                    this.generating = true;
+                    this.errorMessage = '';
+                    this.generatedContent = '';
+                    
+                    try {
+                        const content = await this.callGeminiAPI();
+                        this.generatedContent = content;
+                        this.showSuccess('内容生成成功！');
+                    } catch (error) {
+                        console.error('Generation error:', error);
+                        this.showError('生成失败: ' + error.message);
+                    } finally {
+                        this.generating = false;
+                    }
+                },
+                
+                async callGeminiAPI() {
+                    const prompt = this.buildPrompt();
+
+                    console.log('发送请求到 Gemini API...');
+
+                    const requestBody = {
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 2048,
+                            stopSequences: []
+                        },
+                        safetySettings: [
+                            {
+                                category: "HARM_CATEGORY_HARASSMENT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_HATE_SPEECH",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            }
+                        ]
+                    };
+
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    console.log('API 响应状态:', response.status, response.statusText);
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('API 错误响应:', errorData);
+
+                        let errorMessage = 'API 请求失败';
+                        if (errorData.error) {
+                            if (errorData.error.message) {
+                                errorMessage = errorData.error.message;
+                            } else if (errorData.error.details) {
+                                errorMessage = errorData.error.details[0]?.reason || errorMessage;
+                            }
+                        }
+
+                        throw new Error(errorMessage);
+                    }
+
+                    const data = await response.json();
+                    console.log('API 成功响应:', data);
+
+                    if (!data.candidates || data.candidates.length === 0) {
+                        throw new Error('API 没有返回候选结果');
+                    }
+
+                    const candidate = data.candidates[0];
+
+                    if (candidate.finishReason === 'SAFETY') {
+                        throw new Error('内容被安全过滤器阻止，请尝试修改提示词');
+                    }
+
+                    if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+                        throw new Error('API 返回了无效的响应格式');
+                    }
+
+                    return candidate.content.parts[0].text;
+                },
+                
+                buildPrompt() {
+                    const contentTypeMap = {
+                        social_post: '社交媒体帖子',
+                        blog_article: '博客文章',
+                        marketing_copy: '营销文案',
+                        product_description: '产品描述'
+                    };
+                    
+                    const toneMap = {
+                        professional: '专业',
+                        casual: '随意',
+                        friendly: '友好',
+                        humorous: '幽默',
+                        inspiring: '鼓舞人心'
+                    };
+                    
+                    const lengthMap = {
+                        short: '简短（50-100字）',
+                        medium: '中等（100-300字）',
+                        long: '详细（300-500字）'
+                    };
+                    
+                    const platformsText = this.selectedPlatforms.map(p => 
+                        this.platforms.find(platform => platform.id === p)?.name
+                    ).join('、');
+                    
+                    return `请为我创作一个${contentTypeMap[this.contentType]}，主题是：${this.prompt}
+
+要求：
+- 语调风格：${toneMap[this.tone]}
+- 内容长度：${lengthMap[this.length]}
+- 目标平台：${platformsText}
+- 语言：${this.language === 'zh-CN' ? '中文' : '英文'}
+
+请确保内容：
+1. 符合目标平台的特点和用户习惯
+2. 具有吸引力和互动性
+3. 包含适当的表情符号和标签（如果适用）
+4. 语言自然流畅，符合指定的语调风格
+
+请直接返回生成的内容，不需要额外的解释。`;
+                },
+                
+                async optimizeContent() {
+                    if (!this.generatedContent) {
+                        this.showError('请先生成内容');
+                        return;
+                    }
+                    
+                    this.generating = true;
+                    this.errorMessage = '';
+                    
+                    try {
+                        const optimizePrompt = `请优化以下内容，使其更加吸引人和有效：
+
+原内容：
+${this.generatedContent}
+
+优化要求：
+1. 提高内容的吸引力和互动性
+2. 优化结构和表达方式
+3. 添加更有效的调用行动（CTA）
+4. 保持原有的核心信息和语调
+5. 适合平台：${this.selectedPlatforms.join('、')}
+
+请直接返回优化后的内容：`;
+                        
+                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                contents: [{
+                                    parts: [{
+                                        text: optimizePrompt
+                                    }]
+                                }],
+                                generationConfig: {
+                                    temperature: 0.6,
+                                    topK: 40,
+                                    topP: 0.95,
+                                    maxOutputTokens: 2048,
+                                },
+                                safetySettings: [
+                                    {
+                                        category: "HARM_CATEGORY_HARASSMENT",
+                                        threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                                    },
+                                    {
+                                        category: "HARM_CATEGORY_HATE_SPEECH",
+                                        threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                                    },
+                                    {
+                                        category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                                        threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                                    },
+                                    {
+                                        category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                                        threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                                    }
+                                ]
+                            })
+                        });
+                        
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            console.error('优化请求失败:', errorData);
+                            throw new Error(errorData.error?.message || `优化请求失败: ${response.statusText}`);
+                        }
+
+                        const data = await response.json();
+                        console.log('优化响应:', data);
+
+                        if (!data.candidates || data.candidates.length === 0) {
+                            throw new Error('优化没有返回候选结果');
+                        }
+
+                        const candidate = data.candidates[0];
+
+                        if (candidate.finishReason === 'SAFETY') {
+                            throw new Error('优化内容被安全过滤器阻止，请尝试修改内容');
+                        }
+
+                        if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+                            this.generatedContent = candidate.content.parts[0].text;
+                            this.showSuccess('内容优化完成！');
+                        } else {
+                            throw new Error('优化响应格式无效');
+                        }
+                        
+                    } catch (error) {
+                        console.error('Optimization error:', error);
+                        this.showError('优化失败: ' + error.message);
+                    } finally {
+                        this.generating = false;
+                    }
+                },
+                
+                copyContent() {
+                    if (!this.generatedContent) {
+                        this.showError('没有内容可复制');
+                        return;
+                    }
+                    
+                    navigator.clipboard.writeText(this.generatedContent).then(() => {
+                        this.showSuccess('内容已复制到剪贴板！');
+                    }).catch(() => {
+                        this.showError('复制失败，请手动复制');
+                    });
+                },
+                
+                showError(message) {
+                    this.errorMessage = message;
+                    this.successMessage = '';
+                    setTimeout(() => {
+                        this.errorMessage = '';
+                    }, 5000);
+                },
+                
+                showSuccess(message) {
+                    this.successMessage = message;
+                    this.errorMessage = '';
+                    setTimeout(() => {
+                        this.successMessage = '';
+                    }, 3000);
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</body>
+</html>
